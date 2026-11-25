@@ -14,49 +14,9 @@
 
 ---
 
-## 1. 本地预览
-
-双击 `index.html` 即可。
-
-如果浏览器限制本地文件，可在当前目录启动静态服务器：
-
-```bash
-python -m http.server 8000
-# 访问 http://localhost:8000/
-```
-
-无需安装依赖，无构建步骤，无外部图片/字体/CDN。
-
 ---
 
-## 2. 部署到 GitHub Pages
-
-1. 新建 **Public** 仓库：`Flying-car-coursework2`。
-2. 把本目录全部文件上传到仓库 **根目录**：
-   - `index.html`
-   - `styles.css`
-   - `safety.css`
-   - `safety-modules.css`
-   - `safety-layout.css`
-   - `app.js`
-   - `README.md`
-3. 打开 **Settings → Pages**。
-4. **Build and deployment → Source** 选 **Deploy from a branch**。
-5. Branch 选 `main`，Folder 选 `/ (root)`，保存。
-6. 等 1–2 分钟，访问：
-
-```text
-https://XLALA18.github.io/Flying-car-coursework2/
-```
-
-7. 把该链接填进课程作业收集表。
-
-> 必须是**根目录** `index.html`，不要变成 `仓库名/aeroht-safety/index.html`。  
-> 如果 404：先确认仓库 Public、文件在 `main` 根目录、Pages 已保存。
-
----
-
-## 3. 页面结构
+## 1. 页面结构
 
 | 区块 | 内容 |
 | --- | --- |
@@ -86,18 +46,7 @@ https://XLALA18.github.io/Flying-car-coursework2/
 
 ---
 
-## 4. 提交前检查
-
-- [ ] 页脚作者是 `XLALA18 / 15230104`
-- [ ] 页脚网页链接是 `https://XLALA18.github.io/Flying-car-coursework2/`
-- [ ] 仓库是 Public，根目录有 `index.html`
-- [ ] Pages 已启用，链接能打开
-- [ ] 手机宽度 390 px 下无横向滚动（风险矩阵已改成自适应）
-- [ ] 通读“局限”一节，能解释“为什么不做定量概率”
-
----
-
-## 5. 文件说明
+## 2. 文件说明
 
 ```text
 .
@@ -114,7 +63,7 @@ https://XLALA18.github.io/Flying-car-coursework2/
 
 ---
 
-## 6. AI 使用与学术诚信
+## 3. AI 使用与学术诚信
 
 本页使用 AI 辅助完成资料检索、安全分析结构化、SVG 图解、前端编码与文案整理。关键事实回溯至参考文献；评分、FTA、STPA、GSN 均明确标注为教学性分析，不冒充企业或局方结论。
 
