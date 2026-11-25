@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#121416">
+  <title>让每一次起飞，都有证据｜汇天 X3-F 全方位安全分析</title>
+  <meta name="description" content="飞行汽车技术基础第二次作业：以汇天「陆地航母」X3-F 为对象，用 STPA、FMEA、FTA、SOTIF、TARA 与 GSN 完成全方位安全分析。证据截止 2026-11-26。">
+  <meta name="author" content="XLALA18">
+  <meta property="og:title" content="让每一次起飞，都有证据｜汇天 X3-F 全方位安全分析">
+  <meta property="og:description" content="安全不是一张证书，而是一组可以被审计的论证。">
+  <meta property="og:type" content="website">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="safety.css">
+  <link rel="stylesheet" href="safety-modules.css">
+  <link rel="stylesheet" href="safety-layout.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23121416'/%3E%3Cpath d='M32 8 54 30 32 56 10 30Z' fill='none' stroke='%23e34a2f' stroke-width='3'/%3E%3Cpath d='M20 30h24M32 18v24' stroke='%23f2c14e' stroke-width='2'/%3E%3C/svg%3E">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主要内容</a>
+  <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+
+  <header class="site-header" id="siteHeader">
+    <a class="brand" href="#top" aria-label="回到顶部">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 34 34" role="img"><path d="M17 3 30 17 17 31 4 17Z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M11 17h12M17 11v12" stroke="currentColor" stroke-width="1.2"/></svg>
+      </span>
+      <span class="brand-text"><strong>X3-F / SAFETY CASE</strong><small>飞行汽车技术基础 · CASE 02</small></span>
+    </a>
+    <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="siteNav" aria-label="打开目录"><span></span><span></span></button>
+    <nav class="site-nav" id="siteNav" aria-label="页面目录">
+      <a href="#summary">摘要</a>
+      <a href="#boundary">边界</a>
+      <a href="#hazards">危险</a>
+      <a href="#stpa">STPA</a>
+      <a href="#analysis">FMEA/FTA</a>
+      <a href="#sotif">SOTIF</a>
+      <a href="#architecture">架构</a>
+      <a href="#verify">验证</a>
+      <a class="nav-cta" href="#evidence">证据</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="hero safety-hero" id="top">
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="pulse-dot" aria-hidden="true"></span> 飞行汽车技术基础 · 第二次作业 / SAFETY CASE 02</p>
+          <h1><span class="line">让每一次起飞，</span><span class="line accent">都有证据。</span></h1>
+          <p class="hero-sub">汇天「陆地航母」X3-F 全方位安全分析</p>
+          <p class="hero-lead">安全不是一张证书，而是一组可以被审计的论证：从运行域、危险、控制结构，到屏障、验证与运行监控。</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#summary">先看安全结论 <span aria-hidden="true">↓</span></a>
+            <a class="btn btn-ghost" href="#hazards">打开风险矩阵 <span aria-hidden="true">↗</span></a>
+          </div>
+          <dl class="hero-meta">
+            <div><dt>研究对象</dt><dd>汇天 X3-F / 陆地航母 · 飞行体</dd></div>
+            <div><dt>证据截止</dt><dd>2026-11-26</dd></div>
+            <div><dt>方法</dt><dd>STPA × FMEA × FTA × SOTIF × TARA</dd></div>
+          </dl>
+        </div>
+
+        <div class="hero-visual" aria-label="X3-F 六层安全防御示意图">
+          <div class="hero-chip chip-a"><span>SAFETY LAYERS</span><strong>6 <small>layers</small></strong></div>
+          <div class="hero-chip chip-b"><span>FLIGHT CONTROL</span><strong>3 <small>FCC</small></strong></div>
+          <div class="hero-chip chip-c"><span>PROPULSION</span><strong>6 <small>rotors</small></strong></div>
+          <div class="hero-chip chip-d"><span>MAX TAKE-OFF</span><strong>880 <small>kg</small></strong></div>
+
+          <svg class="hero-svg safety-svg" viewBox="0 0 700 700" role="img" aria-labelledby="safetySvgTitle safetySvgDesc">
+            <title id="safetySvgTitle">X3-F 六层安全防御示意图</title>
+            <desc id="safetySvgDesc">以飞行器为中心，向外依次是被动安全、功能安全、预期功能安全、行为安全、信息安全与运行安全六层防御。</desc>
+            <defs>
+              <pattern id="safetyGrid" width="28" height="28" patternUnits="userSpaceOnUse"><path d="M28 0H0V28" fill="none" stroke="#f2c14e" stroke-opacity=".08" stroke-width=".7"/></pattern>
+              <radialGradient id="coreGlow" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#e34a2f" stop-opacity=".24"/><stop offset="1" stop-color="#e34a2f" stop-opacity="0"/></radialGradient>
+            </defs>
+            <rect width="700" height="700" fill="#101416"/>
+            <rect width="700" height="700" fill="url(#safetyGrid)"/>
+            <circle cx="350" cy="350" r="330" fill="url(#coreGlow)"/>
+            <g fill="none" stroke="#f2c14e">
+              <circle cx="350" cy="350" r="318" stroke-opacity=".30" stroke-dasharray="4 9"/>
+              <circle cx="350" cy="350" r="264" stroke-opacity=".36" stroke-dasharray="3 7"/>
+              <circle cx="350" cy="350" r="210" stroke-opacity=".42" stroke-dasharray="3 7"/>
+              <circle cx="350" cy="350" r="156" stroke-opacity=".52" stroke-dasharray="3 6"/>
+              <circle cx="350" cy="350" r="104" stroke-opacity=".65" stroke-dasharray="2 5"/>
+            </g>
+            <g font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="8.5" letter-spacing="1.2" fill="#7bd6c4">
+              <text x="350" y="47" text-anchor="middle">OPERATIONS / 场地 · 天气 · 维护 · SMS</text>
+              <text x="350" y="101" text-anchor="middle" opacity=".78">SECURITY / 网络 · EMC · 供应链</text>
+              <text x="350" y="155" text-anchor="middle" opacity=".78">BEHAVIOR / 程序 · 训练 · 人因</text>
+              <text x="350" y="209" text-anchor="middle" opacity=".78">SOTIF / 包线 · 感知 · 误用</text>
+              <text x="350" y="263" text-anchor="middle" opacity=".78">FUNCTIONAL / 3 FCC · 6 rotors</text>
+              <text x="350" y="317" text-anchor="middle" opacity=".78">PASSIVE / 结构 · 约束 · 坠撞</text>
+              <text x="350" y="670" text-anchor="middle" fill="#f2c14e" opacity=".7">DEFENSE IN DEPTH / 6 LAYERS</text>
+            </g>
+            <path d="M350 350 520 180A240 240 0 0 1 590 350Z" fill="#e34a2f" opacity=".07"/>
+            <path d="M350 350 520 180" stroke="#e34a2f" stroke-width="1.4" stroke-dasharray="5 6" opacity=".7"/>
+            <text x="505" y="164" fill="#ff9b86" font-family="ui-monospace, monospace" font-size="8.5" letter-spacing="1">BOUNDARY VIOLATION</text>
+
+            <g transform="translate(350 350)">
+              <circle r="66" fill="#0b0f10" stroke="#f2c14e" stroke-opacity=".3"/>
+              <g stroke="#c9d1cb" stroke-width="5" stroke-linecap="round">
+                <path d="M0-18-72-40M0-18 72-40M0 18-76 42M0 18 76 42M0-18v36"/>
+              </g>
+              <g stroke="#e34a2f" stroke-width="1.5" opacity=".9">
+                <path d="M0-18-72-40M0-18 72-40M0 18-76 42M0 18 76 42"/>
+              </g>
+              <g fill="#101718" stroke="#e8eee8" stroke-opacity=".65" stroke-width="2">
+                <g transform="translate(-72 -40)"><circle r="15"/><g class="rotor-blades" style="transform-origin:0 0"><path d="M-11 0H11M0-11V11" stroke="#f2c14e" stroke-width="1.8"/></g><circle r="3" fill="#e34a2f"/></g>
+                <g transform="translate(72 -40)"><circle r="15"/><g class="rotor-blades" style="transform-origin:0 0"><path d="M-11 0H11M0-11V11" stroke="#f2c14e" stroke-width="1.8"/></g><circle r="3" fill="#e34a2f"/></g>
+                <g transform="translate(-76 42)"><circle r="15"/><g class="rotor-blades" style="transform-origin:0 0"><path d="M-11 0H11M0-11V11" stroke="#f2c14e" stroke-width="1.8"/></g><circle r="3" fill="#e34a2f"/></g>
+                <g transform="translate(76 42)"><circle r="15"/><g class="rotor-blades" style="transform-origin:0 0"><path d="M-11 0H11M0-11V11" stroke="#f2c14e" stroke-width="1.8"/></g><circle r="3" fill="#e34a2f"/></g>
+                <g transform="translate(-92 0)"><circle r="13"/><g class="rotor-blades" style="transform-origin:0 0"><path d="M-9 0H9M0-9V9" stroke="#f2c14e" stroke-width="1.8"/></g><circle r="2.6" fill="#e34a2f"/></g>
+                <g transform="translate(92 0)"><circle r="13"/><g class="rotor-blades" style="transform-origin:0 0"><path d="M-9 0H9M0-9V9" stroke="#f2c14e" stroke-width="1.8"/></g><circle r="2.6" fill="#e34a2f"/></g>
+              </g>
+              <path d="M-22-54c18-8 26-8 44 0l12 54-12 54c-18 8-26 8-44 0L-34 0Z" fill="#d9dcd6" stroke="#f4f5ef" stroke-width="1.4"/>
+              <path d="M-12-30c8-5 16-5 24 0l4 30-4 30c-8 5-16 5-24 0L-16 0Z" fill="#223537"/>
+              <path d="M-34 0h68" stroke="#e34a2f" stroke-width="2"/>
+              <text x="0" y="78" text-anchor="middle" fill="#7bd6c4" font-family="ui-monospace, monospace" font-size="8" letter-spacing="1.5">X3-F / 2 SEATS</text>
+            </g>
+
+            <g transform="translate(54 596)"><rect width="210" height="34" fill="#151b1d" stroke="#7bd6c4" stroke-opacity=".3"/><text x="10" y="14" fill="#7bd6c4" font-family="ui-monospace, monospace" font-size="8" letter-spacing="1">TOP EVENT / LOSS OF CONTROL</text><text x="10" y="27" fill="#ff9b86" font-family="ui-monospace, monospace" font-size="9" letter-spacing="1">uncontrolled descent</text></g>
+            <g transform="translate(452 596)"><rect width="194" height="34" fill="#151b1d" stroke="#f2c14e" stroke-opacity=".3"/><text x="10" y="14" fill="#f2c14e" font-family="ui-monospace, monospace" font-size="8" letter-spacing="1">EVIDENCE STATUS</text><text x="10" y="27" fill="#c9d1cb" font-family="ui-monospace, monospace" font-size="9" letter-spacing="1">public / partial / missing</text></g>
+            <g stroke="#e34a2f" stroke-opacity=".6" stroke-width="1.5"><path d="M24 52V24h28M676 52V24h-28M24 648v28h28M676 648v28h-28"/></g>
+          </svg>
+          <p class="hero-disclaimer">教学性安全分析图，不是官方安全评估或适航结论。风险评分为专家判断，不是故障率。</p>
+        </div>
+      </div>
+      <div class="hero-foot"><span>READ THE ARGUMENT, NOT JUST THE CLAIM</span><span class="hero-foot-line" aria-hidden="true"></span><span>CASE 02 / 14</span></div>
+    </section>
+
+    <div class="ticker safety-ticker" aria-label="安全分析关键数据">
+      <div class="ticker-track">
+        <div class="ticker-group">
+          <span class="ticker-item"><b>16</b> 危险源</span>
+          <span class="ticker-item"><b>6</b> 层防御</span>
+          <span class="ticker-item"><b>3</b> 套飞控 <a class="ref" href="#ref-2">[2]</a></span>
+          <span class="ticker-item"><b>6</b> 旋翼 / 可失效 1–2 <a class="ref" href="#ref-6">[6]</a></span>
+          <span class="ticker-item"><b>5×5</b> 风险矩阵</span>
+          <span class="ticker-item"><b>0</b> 公开故障率 · 不做假精确</span>
+        </div>
+        <div class="ticker-group" aria-hidden="true">
+          <span class="ticker-item"><b>16</b> 危险源</span>
+          <span class="ticker-item"><b>6</b> 层防御</span>
+          <span class="ticker-item"><b>3</b> 套飞控 <a class="ref" href="#ref-2">[2]</a></span>
+          <span class="ticker-item"><b>6</b> 旋翼 / 可失效 1–2 <a class="ref" href="#ref-6">[6]</a></span>
+          <span class="ticker-item"><b>5×5</b> 风险矩阵</span>
+          <span class="ticker-item"><b>0</b> 公开故障率 · 不做假精确</span>
+        </div>
+      </div>
+      <span class="ticker-stamp">SAFETY CUT-OFF 2026-11-26</span>
+    </div>
+
+    <section class="section section-summary" id="summary">
+      <div class="section-head" data-reveal>
+        <p class="kicker">00 / SAFETY EXECUTIVE SUMMARY</p>
+        <h2>先给结论：最大风险不只在旋翼，而在「边界外运行」与「组织失效」。</h2>
+        <p class="dek">X3-F 的设计冗余足以支撑一个可信的安全故事，但公开证据仍停留在“部件/演示”层。真正决定它是否安全的，是它能否被限制在被证明允许的运行域内，并由一套可审计的运行体系持续守住。</p>
+      </div>
+      <div class="thesis-panel safety-thesis" data-reveal>
+        <p class="thesis-label">THESIS / 核心判断</p>
+        <blockquote>“安全不是把每个部件做得更可靠，而是让<em>危险</em>在到达人之前，被至少两层独立屏障接住。”</blockquote>
+        <div class="thesis-meta"><span>对象：X3-F 飞行体 + 6×6 陆行体 + 对接接口</span><span>方法：FHA → STPA → FMEA/FTA → SOTIF/TARA → GSN</span></div>
+      </div>
+      <div class="finding-grid">
+        <article class="finding-card" data-reveal>
+          <div class="finding-top"><span>01</span><span class="status status-orange">冗余强，但未证独立</span></div>
+          <h3>3 套飞控、6 旋翼、多伞，是“设计冗余”，不是“安全证明”。</h3>
+          <p>官方称 6 旋翼中 1–2 个失效仍可安全迫降，整机多伞可在 50 m 开伞。但共因失效、传感器投票、软件独立性、伞包线、维护差错，公开材料都没有给出定量证据。</p>
+          <a class="text-link" href="#architecture">看防御层与安全论证 <span aria-hidden="true">→</span></a>
+        </article>
+        <article class="finding-card" data-reveal>
+          <div class="finding-top"><span>02</span><span class="status status-red">运行 / 最强屏障</span></div>
+          <h3>昼间目视、120 m AGL、20 km，本身就是安全措施。</h3>
+          <p>把飞行限制在白天、可见、低高度、短航程、符合条件的起降点，能消掉大量夜间、气象、城市障碍与长航时风险。反过来，任何“超出 ODD”的商业叙事，都是把安全余量拿去换故事。</p>
+          <a class="text-link" href="#odd">拆开运行边界 <span aria-hidden="true">→</span></a>
+        </article>
+        <article class="finding-card" data-reveal>
+          <div class="finding-top"><span>03</span><span class="status status-blue">接口 / 第三安全域</span></div>
+          <h3>空中安全 + 地面安全 ≠ 系统安全。</h3>
+          <p>6×6 母舰、自动对接、补能、运输，构成一个常被忽略的“接口安全域”。锁未锁死、重心错误、充电热失控、运输碰撞，都可能在起飞前就埋下事故链。</p>
+          <a class="text-link" href="#ground">看接口危险 <span aria-hidden="true">→</span></a>
+        </article>
+      </div>
+      <div class="stat-strip safety-stats" data-reveal>
+        <div class="stat"><span class="stat-label">危险源</span><strong class="count" data-target="16">16</strong><small>覆盖空中 / 地面 / 接口 / 组织</small></div>
+        <div class="stat"><span class="stat-label">防御层</span><strong class="count" data-target="6">6</strong><small>被动 / 功能 / SOTIF / 行为 / 安全 / 运行</small></div>
+        <div class="stat"><span class="stat-label">飞控冗余</span><strong class="count" data-target="3">3</strong><small>套飞控，官方口径</small></div>
+        <div class="stat"><span class="stat-label">旋翼</span><strong class="count" data-target="6">6</strong><small>可失效 1–2 个，官方口径</small></div>
+        <div class="stat"><span class="stat-label">风险矩阵</span><strong>5×5</strong><small>严重度 × 可能性，定性评分</small></div>
+      </div>
+      <p class="section-note" data-reveal>读法：<span class="status status-green">证据充分</span> / <span class="status status-orange">部分证据</span> / <span class="status status-red">证据缺口</span>。所有评分是教学性专家判断，不代表 CAAC 或企业结论。</p>
+    </section>
+
+    <!-- 01 BOUNDARY -->
+    <section class="section section-boundary" id="boundary">
+      <div class="section-head" data-reveal>
+        <p class="kicker">01 / SYSTEM &amp; SAFETY BOUNDARY</p>
+        <h2>先画边界：空中、地面、接口，三个安全域不能混在一起。</h2>
+        <p class="dek">飞行汽车的安全分析最容易犯的错，是把“飞行器适航”当成“系统安全”。X3-F 至少包含三个安全域：飞行体、6×6 陆行体、以及两者之间的自动对接/补能接口。</p>
+      </div>
+      <div class="split-layout">
+        <div class="prose" data-reveal>
+          <p class="dropcap">X3-F 的官方安全叙事集中在四个点：<strong>3 套飞控</strong>、<strong>6 旋翼中 1–2 个失效仍可迫降</strong>、<strong>整机多伞</strong>、<strong>高安全电池</strong><a class="ref" href="#ref-1">[1]</a>。这些都属于“部件/子系统级”的安全措施，但系统安全还要回答：它们是否独立？在什么场景下有效？失效后谁来接管？</p>
+          <p>更关键的是，X3-F 不是一架孤立的飞机。它被 6×6 母舰运输、收纳、补能，再通过自动对接机构释放。任何一个接口环节出错，都可能让“适航的飞行体”在一个不安全的状态下起飞。</p>
+          <p>因此，本页把安全边界定义为：<strong>飞行体 + 陆行体 + 对接接口 + 运行/维护组织</strong>。安全目标不是“永不失效”，而是“在定义运行域内，把失效的后果控制在可接受水平”。</p>
+          <div class="callout callout-warning">
+            <div><span class="callout-tag">SCOPE</span><h3>本页做“安全分析”，不做“适航符合性声明”。</h3></div>
+            <p>我们不声称 X3-F 已满足某条适航标准，也不伪造故障率。所有评分与情景都是教学性分析，用来展示“如何把安全论证讲清楚”。</p>
+          </div>
+        </div>
+        <aside class="system-card" data-reveal>
+          <div class="card-head"><span>SYSTEM BOUNDARY</span><span class="mono">3 DOMAINS</span></div>
+          <div class="domain-list">
+            <div><span class="domain-no">A</span><h4>飞行体</h4><p>6 旋翼 / 3 FCC / 多伞 / 电池 / 2 座</p><em>空中安全</em></div>
+            <div><span class="domain-no">B</span><h4>陆行体</h4><p>6×6 / 800V / 运输 / 补能 / 收纳</p><em>地面安全</em></div>
+            <div><span class="domain-no">C</span><h4>对接接口</h4><p>锁止 / 电气 / 数据 / 重心 / 顺序</p><em>接口安全</em></div>
+            <div><span class="domain-no">D</span><h4>运行组织</h4><p>场地 / 空域 / 训练 / 维修 / 应急</p><em>组织安全</em></div>
+          </div>
+          <div class="system-claim"><span>SYSTEM SAFETY CLAIM</span><p>在定义运行域内，X3-F 的整机风险应被控制在可接受水平；任何单点失效不得直接导致失控，任何接口错误不得导致非指令起飞。</p></div>
+        </aside>
+      </div>
+
+      <div class="subsection-head" data-reveal><p class="kicker">MISSION CHAIN / 任务链</p><h3>安全分析要跟着任务走，而不是跟着部件走。</h3></div>
+      <div class="mission-chain" data-reveal>
+        <div><span>01</span><b>装载</b><p>入舱、锁止、重心确认</p></div>
+        <div><span>02</span><b>运输</b><p>6×6 行驶、固定、碰撞</p></div>
+        <div><span>03</span><b>释放</b><p>对接、展开、自检、空域</p></div>
+        <div><span>04</span><b>起飞</b><p>悬停、姿态、动力、净空</p></div>
+        <div><span>05</span><b>巡航</b><p>包线、风、障碍、链路</p></div>
+        <div><span>06</span><b>着陆</b><p>进近、接地、侧风、隔离</p></div>
+        <div><span>07</span><b>回收</b><p>折叠、锁止、补能、检查</p></div>
+        <div><span>08</span><b>维护</b><p>电池、伞、旋翼、软件</p></div>
+      </div>
+
+      <div class="subsection-head" data-reveal><p class="kicker">SAFETY EVIDENCE / 官方安全主张</p><h3>四个“强项”，四个必须追问的“然后呢？”</h3></div>
+      <div class="evidence-mini-grid">
+        <article data-reveal><span class="mini-tag">03 FCC</span><h4>三套飞控</h4><p>官方称三套飞控互为备份。追问：是否同源软件？传感器是否独立？投票/切换是否有瞬态？</p><b>需要：独立性分析 + 故障注入</b></article>
+        <article data-reveal><span class="mini-tag">06 ROTORS</span><h4>六旋翼冗余</h4><p>官方称 1–2 个旋翼失效仍可安全迫降。追问：失效组合、悬停/巡航/着陆阶段是否都覆盖？</p><b>需要：全包线失效试验</b></article>
+        <article data-reveal><span class="mini-tag">MULTI-CHUTE</span><h4>整机多伞</h4><p>公开试验：850 kg、50 m 超低空开伞、5.2 m/s 接地。追问：开伞包线、姿态、下沉率、伞绳缠绕。</p><b>需要：包线 + 可靠性证据</b></article>
+        <article data-reveal><span class="mini-tag">BATTERY</span><h4>高安全电池</h4><p>360 Wh/kg、25C、15.2 m 坠落测试。追问：整包热失控传播、碰撞后绝缘、循环老化。</p><b>需要：整机级热失控试验</b></article>
+      </div>
+      <div class="callout callout-danger" data-reveal>
+        <div><span class="callout-tag">BOUNDARY WARNING</span><h3>“能飞”不是安全目标，“只在允许的边界内飞”才是。</h3></div>
+        <p>X3-F 的专用条件明确：昼间目视、私人娱乐/飞行培训、不用于商业载客。任何超出这个边界的运行，都需要重新做危险分析、风险评估与运行许可，而不是把现有安全论证“外推”。<a class="ref" href="#ref-3">[3]</a><a class="ref" href="#ref-4">[4]</a></p>
+      </div>
+    </section>
+
+    <!-- 02 METHOD -->
+    <section class="section section-method" id="method">
+      <div class="section-head" data-reveal>
+        <p class="kicker">02 / METHOD &amp; STANDARDS</p>
+        <h2>方法：从系统工程到安全系统工程，再到可审计的安全论证。</h2>
+        <p class="dek">课程把智能运载工具的安全开发拆成 0–8 步：安全文化与管理、整机功能与场景定义、安全分析方法、系统安全架构、硬件/软件/机械化学安全设计、测试验证、运行安全论证。这个顺序，就是本页的骨架。<a class="ref" href="#ref-5">[5, p.84–87]</a></p>
+      </div>
+      <div class="vmodel" data-reveal>
+        <div class="vmodel-row">
+          <div class="vstep"><span>0</span><h4>安全文化<br>&amp; 管理</h4><p>SMS、just culture、变更与供应商管理</p></div>
+          <div class="vstep"><span>1</span><h4>整机功能<br>&amp; 场景</h4><p>任务、ODD、运行场景、边界条件</p></div>
+          <div class="vstep"><span>2</span><h4>安全分析<br>方法</h4><p>FHA、STPA、FMEA、FTA、TARA</p></div>
+          <div class="vstep"><span>3</span><h4>系统安全<br>架构</h4><p>冗余、隔离、降级、故障响应</p></div>
+          <div class="vstep"><span>4–6</span><h4>硬件 / 软件<br>/ 机械化学</h4><p>FCC、BMS、旋翼、伞、结构、防火</p></div>
+          <div class="vstep"><span>7</span><h4>安全测试<br>验证</h4><p>台架、HIL、铁鸟、试飞、坠撞、EMC</p></div>
+          <div class="vstep"><span>8</span><h4>运行安全<br>论证</h4><p>SMS、事件报告、持续适航、GSN</p></div>
+        </div>
+        <p class="vmodel-note">左半程：把“要安全”翻译成需求与架构；右半程：用证据证明需求被满足，并在运行中持续监控。方法框架参考课程与证据分级案例。<a class="ref" href="#ref-21">[21]</a></p>
+      </div>
+
+      <div class="safety-stack" data-reveal>
+        <div class="stack-head"><span>SAFETY STACK / 六层防御</span><span class="mono">INSIDE → OUTSIDE</span></div>
+        <div class="stack-row"><span class="stack-no">01</span><b>被动安全</b><p>结构、约束、能量吸收、坠撞、防火、逃生</p><em>事故发生后，尽量把人保住</em></div>
+        <div class="stack-row"><span class="stack-no">02</span><b>功能安全</b><p>3 FCC、6 旋翼、冗余电源、故障检测与降级</p><em>部件坏了，系统还能安全地退</em></div>
+        <div class="stack-row"><span class="stack-no">03</span><b>预期功能安全 SOTIF</b><p>包线保护、感知局限、人机交互、可预见误用</p><em>没坏，但“不够好”也会出事</em></div>
+        <div class="stack-row"><span class="stack-no">04</span><b>行为安全</b><p>程序、训练、空域规则、机组/乘客行为</p><em>人和系统的交互不能靠默契</em></div>
+        <div class="stack-row"><span class="stack-no">05</span><b>信息安全</b><p>secure boot、签名、认证、IDS、供应链、EMC</p><em>被攻击/被干扰，也可能导致失控</em></div>
+        <div class="stack-row"><span class="stack-no">06</span><b>运行安全</b><p>场地、天气、维修、应急、事件报告、持续适航</p><em>安全不是交付物，是每天的运行</em></div>
+      </div>
+
+      <div class="table-scroll" data-reveal>
+        <table class="data-table standards-table">
+          <caption>标准与框架：不是“拿证清单”，而是“证据组织方式”</caption>
+          <thead><tr><th>领域</th><th>标准 / 框架</th><th>在本页的用途</th><th>不能证明什么</th></tr></thead>
+          <tbody>
+            <tr><td>航空系统</td><td>SAE ARP4754A <a class="ref" href="#ref-11">[11]</a> / ARP4761A <a class="ref" href="#ref-12">[12]</a></td><td>系统开发、FHA/PSSA/SSA、安全评估流程</td><td>不自动证明 X3-F 已符合</td></tr>
+            <tr><td>机载软件/硬件</td><td>DO-178C <a class="ref" href="#ref-13">[13]</a> / DO-254 <a class="ref" href="#ref-14">[14]</a></td><td>软件/硬件生命周期与验证证据</td><td>LSA 专用条件未必强制，但可作为最佳实践</td></tr>
+            <tr><td>环境/EMC</td><td>DO-160 <a class="ref" href="#ref-15">[15]</a></td><td>温度、振动、湿热、雷电、EMC 试验剖面</td><td>不覆盖运行组织与人因</td></tr>
+            <tr><td>汽车功能安全</td><td>ISO 26262 <a class="ref" href="#ref-16">[16]</a></td><td>陆行体 E/E、drive-by-wire、BMS 的 FuSa</td><td>不能直接套到飞行体</td></tr>
+            <tr><td>预期功能安全</td><td>ISO 21448 <a class="ref" href="#ref-17">[17]</a></td><td>性能局限、可预见误用、场景验证</td><td>不替代失效分析</td></tr>
+            <tr><td>信息安全</td><td>ISO/SAE 21434 <a class="ref" href="#ref-18">[18]</a></td><td>TARA、威胁分析、安全需求与验证</td><td>不覆盖物理碰撞</td></tr>
+            <tr><td>系统理论</td><td>STPA / SAE J3187 <a class="ref" href="#ref-19">[19]</a></td><td>控制结构、UCA、损失场景</td><td>不提供定量概率</td></tr>
+            <tr><td>安全论证</td><td>GSN / SACM <a class="ref" href="#ref-20">[20]</a></td><td>把主张、证据、假设、反驳组织成可审计结构</td><td>不产生新证据</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="table-note">标准清单参考课程第 5 章与 ARP4754A/4761A 流程；标准条目见 [11]–[18]；本页不声称任何标准符合性。<a class="ref" href="#ref-5">[5, p.81–87]</a></p>
+
+      <div class="method-chain" data-reveal>
+        <div><span>STEP 1</span><b>界定系统与 ODD</b><p>先定义“在什么条件下飞”</p></div>
+        <div><span>STEP 2</span><b>识别危险</b><p>FHA / HAZOP / 任务链</p></div>
+        <div><span>STEP 3</span><b>评估风险</b><p>严重度 × 可能性，排序</p></div>
+        <div><span>STEP 4</span><b>分析因果</b><p>STPA + FMEA + FTA</p></div>
+        <div><span>STEP 5</span><b>设计屏障</b><p>预防、检测、降级、缓解</p></div>
+        <div><span>STEP 6</span><b>论证与验证</b><p>GSN + 测试 + 运行监控</p></div>
+      </div>
+    </section>
+
+    <!-- 03 ODD -->
+    <section class="section section-odd" id="odd">
+      <div class="section-head" data-reveal>
+        <p class="kicker">03 / OPERATIONAL DOMAIN</p>
+        <h2>运行域：每一条限制，都是一道安全屏障。</h2>
+        <p class="dek">X3-F 的专用条件把运行域压得很窄：昼间目视、120 m AGL、20 km、20 min、2 座、私人娱乐/培训、不商业载客。窄，不是缺点；对一个新类别来说，窄边界是可控入场的代价。</p>
+      </div>
+      <div class="odd-layout">
+        <div class="odd-params" data-reveal>
+          <div class="card-head"><span>ODD / 运行设计域</span><span class="mono">X3-F</span></div>
+          <div class="odd-grid">
+            <div><span>时间</span><b>昼间</b><em>day VFR only</em></div>
+            <div><span>高度</span><b>≤ 120 m AGL</b><em>2,500 m MSL</em></div>
+            <div><span>航程 / 航时</span><b>20 km / 20 min</b><em>设计最大值</em></div>
+            <div><span>速度</span><b>≤ 72 km/h</b><em>VNE</em></div>
+            <div><span>座舱</span><b>2 座</b><em>1 驾驶员 + 1 乘客</em></div>
+            <div><span>用途</span><b>私人娱乐 / 培训</b><em>不商业载客</em></div>
+            <div><span>起降</span><b>符合条件的起降点</b><em>隔离区 / 净空</em></div>
+            <div><span>气象</span><b>目视气象条件</b><em>无结冰 / 无雷暴</em></div>
+          </div>
+          <p class="panel-note">参数来自 CAAC X3-F 专用条件与公开报道；实际运行限制以最终 TC 数据单为准。<a class="ref" href="#ref-4">[4]</a><a class="ref" href="#ref-3">[3]</a></p>
+        </div>
+        <div class="odd-fence" data-reveal>
+          <div class="fence-head"><span>ODD FENCE</span><span class="mono">OUTSIDE = NEW SAFETY CASE</span></div>
+          <div class="fence-item"><span>✕</span><div><b>夜航 / 仪表气象</b><p>能见度、障碍、空间定向、灯光与救援都变复杂。</p></div></div>
+          <div class="fence-item"><span>✕</span><div><b>城市上空 / 人群密集</b><p>地面第三方风险、噪声、坠撞后果显著上升。</p></div></div>
+          <div class="fence-item"><span>✕</span><div><b>商业载客 / 付费游览</b><p>专用条件明确不允许；需要另一套运行许可与保险。</p></div></div>
+          <div class="fence-item"><span>✕</span><div><b>超视距 / 编队 / 复杂空域</b><p>感知与避让、通信、空管协同都超出当前证据。</p></div></div>
+          <div class="fence-item"><span>✕</span><div><b>水上 / 结冰 / 雷暴</b><p>迫降、伞降、电池与结构环境适应性未覆盖。</p></div></div>
+          <div class="fence-item"><span>✕</span><div><b>超 20 km / 20 min</b><p>能量余量与返航储备不足，会把“延迟”变成“迫降”。</p></div></div>
+        </div>
+      </div>
+      <div class="subsection-head" data-reveal><p class="kicker">WHY IT MATTERS / 为什么边界是安全措施</p><h3>把风险“关在门外”，比在门内加一层冗余更有效。</h3></div>
+      <div class="boundary-reasons">
+        <article data-reveal><span>01</span><h4>昼间目视</h4><p>去掉夜航、低能见度、仪表飞行的空间定向与障碍识别风险；代价是运行窗口变窄。</p></article>
+        <article data-reveal><span>02</span><h4>120 m AGL</h4><p>限制高度，降低与有人航空器、建筑物、气象系统的冲突；但低空障碍与噪声仍存在。</p></article>
+        <article data-reveal><span>03</span><h4>20 km / 20 min</h4><p>强制短程，保留返航与备降余量；也意味着它不能承担“赶时间”的交通任务。</p></article>
+        <article data-reveal><span>04</span><h4>符合条件起降点</h4><p>把起降从“随便一块空地”变成“有净空、隔离、消防、人员的场地”，消掉大量地面风险。</p></article>
+      </div>
+      <div class="callout callout-quote" data-reveal><p>“运行域不是营销限制，而是安全论证的前提。任何一次越界，都会让原来的安全 case 失效。”</p><span>ODD / 本页核心判断</span></div>
+    </section>
+
+    <!-- 04 HAZARDS -->
+    <section class="section section-hazards" id="hazards">
+      <div class="section-head" data-reveal>
+        <p class="kicker">04 / HAZARD &amp; RISK</p>
+        <h2>危险识别：16 个危险源，先按“后果 × 可能性”排队。</h2>
+        <p class="dek">这不是完整 FHA，而是一个可审计的危险日志：每个危险都有触发条件、后果、屏障、证据缺口与目标残余风险。评分是教学性专家判断，不是故障率。</p>
+      </div>
+      <div class="risk-toolbar" data-reveal>
+        <div class="filter-chips" id="hazardFilters" role="group" aria-label="按类别筛选危险源">
+          <button class="chip is-active" data-hazard-filter="all" type="button">全部 <span>16</span></button>
+          <button class="chip" data-hazard-filter="control" type="button">飞行控制 <span>4</span></button>
+          <button class="chip" data-hazard-filter="energy" type="button">能源/电池 <span>3</span></button>
+          <button class="chip" data-hazard-filter="structure" type="button">结构/接口 <span>3</span></button>
+          <button class="chip" data-hazard-filter="human" type="button">运行/人因 <span>4</span></button>
+          <button class="chip" data-hazard-filter="cyber" type="button">网络/EMC <span>1</span></button>
+          <button class="chip" data-hazard-filter="ground" type="button">地面/接口 <span>1</span></button>
+        </div>
+        <p class="filter-hint">点击矩阵中的编号查看详情；点击类别筛选。</p>
+      </div>
+      <div class="risk-layout">
+        <div class="risk-matrix-card" data-reveal>
+          <div class="card-head"><span>RISK MATRIX / 5×5</span><span class="mono">SEVERITY × LIKELIHOOD</span></div>
+          <div id="riskMatrix" class="risk-matrix" aria-label="5×5 风险矩阵"></div>
+          <div class="risk-legend"><span><i class="risk-low"></i>低 1–3</span><span><i class="risk-medium"></i>中 4–7</span><span><i class="risk-high"></i>高 8–14</span><span><i class="risk-extreme"></i>极高 15–25</span></div>
+          <p class="matrix-note">纵轴：严重度 5→1；横轴：可能性 1→5。评分是教学性判断，不代表 CAAC 或企业结论。</p>
+        </div>
+        <aside class="hazard-detail" id="hazardDetail" data-reveal aria-live="polite">
+          <div class="card-head"><span>HAZARD DETAIL</span><span class="mono">SELECT A NODE</span></div>
+          <div id="hazardDetailBody">
+            <p class="detail-placeholder">点击左侧矩阵中的危险编号，查看它的触发条件、后果、屏障与证据缺口。</p>
+            <div class="detail-hint-grid"><div><span>01</span><p>先看后果，不先看概率。</p></div><div><span>02</span><p>再问现有屏障是否独立。</p></div><div><span>03</span><p>最后写清还缺什么证据。</p></div></div>
+          </div>
+        </aside>
+      </div>
+      <div class="top-risk-grid">
+        <article data-reveal><span class="risk-id">H02</span><h3>单旋翼/电机失效</h3><p>6 旋翼冗余是核心屏障，但全包线失效组合未公开。</p><b>S4 × L3 = 12 · 高</b></article>
+        <article data-reveal><span class="risk-id">H11</span><h3>低空阵风/风切变</h3><p>120 m AGL 内风场复杂；包线保护、风速限制与备降场地是关键。</p><b>S4 × L3 = 12 · 高</b></article>
+        <article data-reveal><span class="risk-id">H12</span><h3>飞行员模式混淆/超负荷</h3><p>单驾驶 + 自动模式 + 紧急程序，容易在低空短窗口内压垮人。</p><b>S4 × L3 = 12 · 高</b></article>
+        <article data-reveal><span class="risk-id">H13</span><h3>维护差错/放行错误</h3><p>伞包、旋翼、电池、软件配置都依赖正确维护；记录与双签是屏障。</p><b>S4 × L3 = 12 · 高</b></article>
+        <article data-reveal><span class="risk-id">H14</span><h3>超范围/商业载客运行</h3><p>商业压力、夜航、超程、载客，都会把系统推入未验证包线。</p><b>S5 × L2 = 10 · 高</b></article>
+      </div>
+      <div class="table-scroll" data-reveal>
+        <table class="hazard-table">
+          <caption>危险日志 / 可筛选、可追溯</caption>
+          <thead><tr><th>ID</th><th>危险</th><th>类别</th><th>S</th><th>L</th><th>风险</th><th>主要屏障</th><th>目标残余</th></tr></thead>
+          <tbody id="hazardTableBody"></tbody>
+        </table>
+      </div>
+      <p class="table-note">S = 严重度，L = 可能性，风险 = S × L。目标残余风险是“在现有/建议屏障生效后”的教学目标，不是已验证结果。没有公开故障率，因此不做定量概率计算。</p>
+    </section>
+
+    <!-- 05 STPA -->
+    <section class="section section-stpa" id="stpa">
+      <div class="section-head" data-reveal>
+        <p class="kicker">05 / STPA</p>
+        <h2>STPA：很多事故不是“部件坏了”，而是“控制不安全”。</h2>
+        <p class="dek">FMEA 问“这个部件怎么坏”，STPA 问“这个控制动作在什么上下文下是危险的”。对于单驾驶、自动模式、低空短窗口的 X3-F，后者尤其重要。</p>
+      </div>
+      <div class="stpa-tabs" data-reveal>
+        <div class="tabs" role="tablist" aria-label="STPA 分析视图">
+          <button class="tab is-active" id="tab-stpa-structure" role="tab" aria-selected="true" aria-controls="panel-stpa-structure" data-tab="stpa-structure">控制结构</button>
+          <button class="tab" id="tab-stpa-uca" role="tab" aria-selected="false" aria-controls="panel-stpa-uca" data-tab="stpa-uca">不安全控制动作</button>
+          <button class="tab" id="tab-stpa-loss" role="tab" aria-selected="false" aria-controls="panel-stpa-loss" data-tab="stpa-loss">损失场景</button>
+        </div>
+        <div class="tab-panel is-active" id="panel-stpa-structure" role="tabpanel" aria-labelledby="tab-stpa-structure">
+          <div class="control-loop" aria-label="X3-F 简化 STPA 控制结构">
+            <div class="loop-column">
+              <div class="loop-box loop-controller"><span>CONTROLLER</span><b>飞行员 / 飞控</b><p>模式选择、推力指令、航向/高度、应急</p></div>
+              <div class="loop-box loop-controller"><span>CONTROLLER</span><b>3 × FCC</b><p>控制律、包线保护、故障重构、投票</p></div>
+              <div class="loop-box loop-controller"><span>CONTROLLER</span><b>BMS / 能源管理</b><p>放电限制、温度、剩余电量、隔离</p></div>
+            </div>
+            <div class="loop-arrows" aria-hidden="true"><span>控制动作 →</span><span>反馈 ←</span></div>
+            <div class="loop-column">
+              <div class="loop-box loop-actuator"><span>ACTUATOR</span><b>6 × 旋翼 / 电机</b><p>推力、差动、转速</p></div>
+              <div class="loop-box loop-actuator"><span>ACTUATOR</span><b>整机多伞</b><p>弹射、开伞、减速</p></div>
+              <div class="loop-box loop-actuator"><span>ACTUATOR</span><b>对接锁 / 补能</b><p>锁止、释放、充电</p></div>
+            </div>
+            <div class="loop-environment"><span>ENVIRONMENT / 运行环境</span><p>风、障碍、人员、空域、电磁、温度、GNSS 信号、地面保障</p></div>
+            <div class="loop-sensors"><span>SENSORS / 反馈</span><p>IMU、GNSS、气压、磁罗盘、旋翼反馈、电池温度/电压、锁止传感器</p></div>
+          </div>
+          <p class="panel-note">简化控制结构，用于展示 STPA 思路；未公开的 X3-F 真实控制拓扑不在本页臆测。</p>
+        </div>
+        <div class="tab-panel" id="panel-stpa-uca" role="tabpanel" aria-labelledby="tab-stpa-uca" hidden>
+          <div class="table-scroll">
+            <table class="data-table uca-table">
+              <caption>不安全控制动作 / Unsafe Control Actions</caption>
+              <thead><tr><th>控制动作</th><th>UCA 类型</th><th>危险上下文</th><th>可能后果</th><th>屏障</th></tr></thead>
+              <tbody>
+                <tr><td>FCC 输出推力指令</td><td>不安全地提供</td><td>姿态估计错误 / 单侧旋翼失效</td><td>非指令滚转、失控</td><td>三余度投票、包线保护、失效重构</td></tr>
+                <tr><td>FCC 限制高度/能量</td><td>未提供</td><td>接近 120 m AGL 或返航余量不足</td><td>超包线、迫降</td><td>地理围栏、能量预测、强制告警</td></tr>
+                <tr><td>对接机构释放</td><td>不安全地提供</td><td>锁止传感器故障 / 未对正</td><td>飞行体掉落、结构损伤</td><td>三取二锁止确认、机械互锁、顺序控制</td></tr>
+                <tr><td>整机伞弹射</td><td>不安全地提供 / 未提供</td><td>姿态/高度/速度在包线外；或伞绳缠绕</td><td>伞无效、二次伤害</td><td>包线判断、冗余弹射、定期打包检测</td></tr>
+                <tr><td>BMS 允许放电</td><td>不安全地提供</td><td>电芯过温 / 低电量 / 碰撞后绝缘失效</td><td>热失控、动力丧失</td><td>多级保护、熔断、隔离、迫降策略</td></tr>
+                <tr><td>飞行员切换自动模式</td><td>不安全地提供</td><td>未确认 ODD / 模式混淆 / 超负荷</td><td>错误接管、失去情景意识</td><td>模式预选、明确反馈、训练、语音告警</td></tr>
+                <tr><td>维修放行</td><td>不安全地提供</td><td>故障未排除 / 软件配置错误</td><td>带病飞行</td><td>双签、配置管理、功能检查、飞行前自检</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="tab-panel" id="panel-stpa-loss" role="tabpanel" aria-labelledby="tab-stpa-loss" hidden>
+          <div class="loss-grid">
+            <article><span>L1</span><h4>传感器“看起来正常”</h4><p>IMU 漂移、GNSS 多路径、磁罗盘受扰，但投票算法识别不了共同偏差。</p><b>需要：独立传感器 + 交叉校验</b></article>
+            <article><span>L2</span><h4>模式切换的瞬态</h4><p>自动切手动时，权限、配平、姿态目标不一致；低空短窗口来不及修正。</p><b>需要：交接协议 + HMI + 训练</b></article>
+            <article><span>L3</span><h4>对接顺序错误</h4><p>锁止、电气、数据、重心确认被跳过；系统“允许起飞”，但物理未锁定。</p><b>需要：硬互锁 + 三取二 + 记录</b></article>
+            <article><span>L4</span><h4>维护后的“隐性偏移”</h4><p>旋翼更换、桨叶安装、伞包重包后，参数未校准；地面自检通过，空中才暴露。</p><b>需要：配置管理 + 功能试验 + 双签</b></article>
+            <article><span>L5</span><h4>组织压力下的越界</h4><p>营地为了体验效果，鼓励在风大、人多、光线差时继续飞。</p><b>需要：SMS + just culture + 停飞权</b></article>
+          </div>
+        </div>
+      </div>
+      <div class="callout callout-quote" data-reveal><p>“STPA 的价值，是让‘没有人按错按钮，但系统仍然不安全’这件事变得可见。”</p><span>系统理论事故模型 / 本页方法</span></div>
+    </section>
+
+    <!-- 06 FMEA / FTA -->
+    <section class="section section-analysis" id="analysis">
+      <div class="section-head" data-reveal>
+        <p class="kicker">06 / FMEA &amp; FTA</p>
+        <h2>FMEA 看单点，FTA 看组合：把“失效”拆成可验证的路径。</h2>
+        <p class="dek">FMEA 适合追问“这个部件怎么坏、后果是什么”；FTA 适合追问“哪些失效组合能一起把顶事件推出来”。两者都不能替代 STPA，但能补上“硬件/软件失效”这一层证据。</p>
+      </div>
+      <div class="table-scroll" data-reveal>
+        <table class="fmea-table">
+          <caption>FMEA / 关键部件失效模式（RPN 为教学评分，不是企业数据）</caption>
+          <thead><tr><th>部件</th><th>失效模式</th><th>系统后果</th><th>S</th><th>O</th><th>D</th><th>RPN</th><th>检测 / 缓解</th></tr></thead>
+          <tbody>
+            <tr><td>旋翼 / 桨叶</td><td>损伤、失衡、断裂</td><td>姿态扰动、迫降</td><td>4</td><td>3</td><td>3</td><td class="rpn rpn-high">36</td><td>振动监测、失效重构、定期检查</td></tr>
+            <tr><td>电机 / 电调</td><td>堵转、退磁、功率管失效</td><td>偏航/滚转、失控风险</td><td>4</td><td>3</td><td>3</td><td class="rpn rpn-high">36</td><td>相电流监测、隔离、剩余旋翼重构</td></tr>
+            <tr><td>飞控 FCC</td><td>输出卡死、软件异常、共因</td><td>失控 / 非指令动作</td><td>5</td><td>2</td><td>4</td><td class="rpn rpn-high">40</td><td>三余度投票、独立电源、看门狗</td></tr>
+            <tr><td>IMU / 传感器</td><td>漂移、卡值、受扰</td><td>错误控制、失控</td><td>5</td><td>2</td><td>4</td><td class="rpn rpn-high">40</td><td>多源交叉校验、故障检测、降级</td></tr>
+            <tr><td>动力电池</td><td>热失控、内短路、过放</td><td>动力丧失、火灾</td><td>5</td><td>2</td><td>3</td><td class="rpn rpn-extreme">30</td><td>BMS 多级保护、熔断、隔离、泄压</td></tr>
+            <tr><td>BMS</td><td>过充/过放误判、接触器粘连</td><td>热失控、断电</td><td>5</td><td>2</td><td>4</td><td class="rpn rpn-high">40</td><td>独立保护、硬件熔断、冗余采样</td></tr>
+            <tr><td>整机降落伞</td><td>弹射失败、伞绳缠绕、超包线</td><td>高速触地</td><td>5</td><td>2</td><td>3</td><td class="rpn rpn-extreme">30</td><td>包线判断、冗余弹射、定期打包/检验</td></tr>
+            <tr><td>对接锁</td><td>未锁止、假锁、意外释放</td><td>掉落、结构损伤</td><td>5</td><td>1</td><td>4</td><td class="rpn rpn-medium">20</td><td>三取二传感器、机械互锁、顺序控制</td></tr>
+            <tr><td>数据总线</td><td>丢包、延迟、错误帧</td><td>模式混淆、失控</td><td>4</td><td>3</td><td>4</td><td class="rpn rpn-high">48</td><td>冗余总线、CRC、超时降级、告警</td></tr>
+            <tr><td>HMI / 显示</td><td>关键信息缺失、误报</td><td>错误决策</td><td>4</td><td>3</td><td>4</td><td class="rpn rpn-high">48</td><td>优先级设计、语音告警、模式反馈</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="table-note">S/O/D 均为 1–10 教学评分；RPN = S×O×D。真实 FMEA 需要企业设计数据、失效率与试验证据，本页不冒充。</p>
+
+      <div class="fta-layout">
+        <div class="fta-card" data-reveal>
+          <div class="card-head"><span>FAULT TREE / 顶事件</span><span class="mono">QUALITATIVE</span></div>
+          <svg class="fta-svg" viewBox="0 0 900 520" role="img" aria-labelledby="ftaTitle ftaDesc">
+            <title id="ftaTitle">非指令失控 / 非计划迫降故障树</title>
+            <desc id="ftaDesc">顶事件为非指令失控或非计划迫降，向下分解为动力丧失、控制丧失、结构/伞失效三大分支。</desc>
+            <rect width="900" height="520" fill="#f7f4eb"/>
+            <g font-family="'Noto Sans SC','Microsoft YaHei',sans-serif">
+              <rect x="300" y="20" width="300" height="54" fill="#e34a2f"/>
+              <text x="450" y="43" text-anchor="middle" fill="#fff" font-size="12" letter-spacing="1">TOP EVENT</text>
+              <text x="450" y="61" text-anchor="middle" fill="#fff" font-size="14" font-weight="600">非指令失控 / 非计划迫降</text>
+              <path d="M450 74v38" stroke="#8f9893" stroke-width="1.5"/>
+              <path d="M450 126 430 142h40Z" fill="#f2c14e" stroke="#8f9893"/>
+              <text x="450" y="160" text-anchor="middle" fill="#5b625e" font-size="10">OR</text>
+              <g stroke="#8f9893" stroke-width="1.5" fill="none">
+                <path d="M450 146v18M450 164H150v26M450 164h300v26M450 164v26"/>
+                <path d="M150 190v24M450 190v24M750 190v24"/>
+              </g>
+              <g>
+                <rect x="55" y="214" width="190" height="54" fill="#fff" stroke="#c9c2b2"/><text x="150" y="236" text-anchor="middle" fill="#8f2b2e" font-size="10">BRANCH A</text><text x="150" y="254" text-anchor="middle" fill="#1a2021" font-size="13">动力丧失</text>
+                <rect x="355" y="214" width="190" height="54" fill="#fff" stroke="#c9c2b2"/><text x="450" y="236" text-anchor="middle" fill="#8f2b2e" font-size="10">BRANCH B</text><text x="450" y="254" text-anchor="middle" fill="#1a2021" font-size="13">控制丧失</text>
+                <rect x="655" y="214" width="190" height="54" fill="#fff" stroke="#c9c2b2"/><text x="750" y="236" text-anchor="middle" fill="#8f2b2e" font-size="10">BRANCH C</text><text x="750" y="254" text-anchor="middle" fill="#1a2021" font-size="13">结构 / 伞失效</text>
+              </g>
+              <g stroke="#8f9893" stroke-width="1.3" fill="none">
+                <path d="M150 268v22M150 290h-60v20M150 290h60v20M150 290v20"/>
+                <path d="M450 268v22M450 290h-60v20M450 290h60v20M450 290v20"/>
+                <path d="M750 268v22M750 290h-60v20M750 290h60v20M750 290v20"/>
+              </g>
+              <g font-size="10" fill="#2a3333">
+                <rect x="45" y="312" width="90" height="42" fill="#f7f4eb" stroke="#c9c2b2"/><text x="90" y="330" text-anchor="middle">电池热失控</text><text x="90" y="344" text-anchor="middle" fill="#8f2b2e">+ 无隔离</text>
+                <rect x="150" y="312" width="90" height="42" fill="#f7f4eb" stroke="#c9c2b2"/><text x="195" y="330" text-anchor="middle">旋翼/电机</text><text x="195" y="344" text-anchor="middle">+ 重构失败</text>
+                <rect x="45" y="366" width="90" height="42" fill="#f7f4eb" stroke="#c9c2b2"/><text x="90" y="384" text-anchor="middle">电调/总线</text><text x="90" y="398" text-anchor="middle">共因失效</text>
+                <rect x="345" y="312" width="90" height="42" fill="#f7f4eb" stroke="#c9c2b2"/><text x="390" y="330" text-anchor="middle">FCC 共因</text><text x="390" y="344" text-anchor="middle">+ 投票失效</text>
+                <rect x="450" y="312" width="90" height="42" fill="#f7f4eb" stroke="#c9c2b2"/><text x="495" y="330" text-anchor="middle">传感器</text><text x="495" y="344" text-anchor="middle">+ 交叉校验失效</text>
+                <rect x="345" y="366" width="90" height="42" fill="#f7f4eb" stroke="#c9c2b2"/><text x="390" y="384" text-anchor="middle">控制律</text><text x="390" y="398" text-anchor="middle">+ 包线外</text>
+                <rect x="645" y="312" width="90" height="42" fill="#f7f4eb" stroke="#c9c2b2"/><text x="690" y="330" text-anchor="middle">结构疲劳</text><text x="690" y="344" text-anchor="middle">+ 检查漏检</text>
+                <rect x="750" y="312" width="90" height="42" fill="#f7f4eb" stroke="#c9c2b2"/><text x="795" y="330" text-anchor="middle">伞弹射失败</text><text x="795" y="344" text-anchor="middle">+ 包线外</text>
+                <rect x="645" y="366" width="90" height="42" fill="#f7f4eb" stroke="#c9c2b2"/><text x="690" y="384" text-anchor="middle">对接锁</text><text x="690" y="398" text-anchor="middle">+ 假锁</text>
+              </g>
+              <rect x="300" y="444" width="300" height="44" fill="#f2c14e" opacity=".18" stroke="#d3a12f"/>
+              <text x="450" y="462" text-anchor="middle" fill="#5b4a1a" font-size="10" letter-spacing="1">MINIMAL CUT SETS / 定性</text>
+              <text x="450" y="478" text-anchor="middle" fill="#2a3333" font-size="10">{电池+无隔离} · {FCC共因+投票失效} · {旋翼+重构失败} · {伞+包线外}</text>
+            </g>
+          </svg>
+          <p class="panel-note">故障树为教学性重构，不是 X3-F 官方 FTA；未使用公开故障率，因此不做定量概率。</p>
+        </div>
+        <div class="fta-notes" data-reveal>
+          <div class="note-block"><span class="note-no">01</span><h3>先看 cut set，不看“总概率”。</h3><p>最小割集告诉我们：哪些失效组合一旦同时出现，就会顶到顶事件。</p></div>
+          <div class="note-block"><span class="note-no">02</span><h3>共因失效是冗余的隐形杀手。</h3><p>3 套 FCC 如果同源软件、同一电源、同一传感器，就不是三套独立屏障。</p></div>
+          <div class="note-block"><span class="note-no">03</span><h3>伞是缓解，不是预防。</h3><p>整机伞降低触地速度，但不能防止进入不可控状态；包线、姿态、伞绳都要验证。</p></div>
+          <div class="note-block"><span class="note-no">04</span><h3>FTA 的边界：人因与组织。</h3><p>“维护漏检”“组织越界”很难塞进传统故障树，需要 STPA 与 SMS 补足。</p></div>
+        </div>
+      </div>
+      <div class="method-compare" data-reveal>
+        <div><span>FMEA</span><b>部件怎么坏？</b><p>适合单点失效、检测与 RPN 排序。</p></div>
+        <div><span>FTA</span><b>哪些组合能顶到事件？</b><p>适合冗余、共因、最小割集。</p></div>
+        <div><span>STPA</span><b>控制为什么变得不安全？</b><p>适合软件密集、人机协同与组织因素。</p></div>
+      </div>
+    </section>
+
+    <!-- 07 SOTIF -->
+    <section class="section section-sotif" id="sotif">
+      <div class="section-head" data-reveal>
+        <p class="kicker">07 / SOTIF &amp; HUMAN FACTORS</p>
+        <h2>没有部件坏，也可能不安全：性能局限与可预见误用。</h2>
+        <p class="dek">SOTIF（ISO 21448）处理“功能不足、性能边界、合理误用”带来的风险。对 X3-F，最典型的是风、光、障碍、电量、模式与人的判断。</p>
+      </div>
+      <div class="sotif-chain" data-reveal>
+        <div class="chain-node"><span>01</span><b>感知</b><p>GNSS、IMU、气压、目视；受多路径、眩光、振动影响。</p></div>
+        <div class="chain-arrow" aria-hidden="true">→</div>
+        <div class="chain-node"><span>02</span><b>决策</b><p>包线判断、返航策略、模式切换；受电量误差、规则模糊影响。</p></div>
+        <div class="chain-arrow" aria-hidden="true">→</div>
+        <div class="chain-node"><span>03</span><b>执行</b><p>旋翼、伞、对接锁；受饱和、卡滞、延迟、电源跌落影响。</p></div>
+        <div class="chain-arrow" aria-hidden="true">→</div>
+        <div class="chain-node chain-human"><span>04</span><b>人</b><p>单驾驶、低空短窗口、自动模式；受 workload、情景意识、训练影响。</p></div>
+      </div>
+      <div class="sotif-layout">
+        <div class="table-scroll" data-reveal>
+          <table class="data-table sotif-table">
+            <caption>SOTIF 场景 / 触发条件与缓解</caption>
+            <thead><tr><th>场景</th><th>触发条件</th><th>风险</th><th>缓解</th><th>证据</th></tr></thead>
+            <tbody>
+              <tr><td>低空阵风</td><td>山谷/湖边/建筑间风速突变</td><td>姿态偏差、漂移、迫降</td><td>风速限制、阵风抑制、备降点</td><td>风洞/试飞包线</td></tr>
+              <tr><td>GNSS 多路径</td><td>峡谷、建筑、水面反射</td><td>定位跳变、返航错误</td><td>多源融合、惯导、地理围栏</td><td>场景注入测试</td></tr>
+              <tr><td>低太阳角/眩光</td><td>日出日落、水面反光</td><td>目视障碍识别下降</td><td>时间窗口、滤光、航线规划</td><td>人因试验</td></tr>
+              <tr><td>电量预测误差</td><td>低温、老化、逆风</td><td>返航余量不足</td><td>保守 reserve、实时能耗模型</td><td>电池循环 + 飞行数据</td></tr>
+              <tr><td>模式混淆</td><td>自动/手动切换、告警过载</td><td>错误操纵</td><td>模式预选、明确反馈、训练</td><td>HMI 评估 + 模拟机</td></tr>
+              <tr><td>乘客干扰</td><td>触碰操纵/舱门</td><td>非指令输入、失稳</td><td>物理隔离、互锁、briefing</td><td>客舱试验</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="human-card" data-reveal>
+          <div class="card-head"><span>HUMAN FACTORS</span><span class="mono">SINGLE PILOT</span></div>
+          <h3>“人作为最后一道防线”只有在训练、程序与界面都成立时才成立。</h3>
+          <ul class="human-list">
+            <li><b>模式意识</b><span>自动/手动、正常/降级，必须一眼可辨。</span></li>
+            <li><b>工作负荷</b><span>低空 20 分钟窗口内，告警、操纵、导航会同时压来。</span></li>
+            <li><b>应急决策</b><span>迫降、开伞、返航，需要明确优先级与不可逆门槛。</span></li>
+            <li><b>乘客管理</b><span>非飞行员乘客的恐慌、触碰，属于可预见误用。</span></li>
+            <li><b>训练迁移</b><span>模拟机、真机、营地环境之间的差异可能造成负迁移。</span></li>
+          </ul>
+        </div>
+      </div>
+      <div class="sotif-cards">
+        <article data-reveal><span>SOTIF 01</span><h4>性能局限不是“故障”</h4><p>传感器没坏，但在低对比度、强反光、多路径下就是不够好；FMEA 抓不到。</p></article>
+        <article data-reveal><span>SOTIF 02</span><h4>合理误用必须被设计进去</h4><p>用户会超程、在大风天飞、让乘客碰操纵；不能只靠说明书禁止。</p></article>
+        <article data-reveal><span>SOTIF 03</span><h4>验证要覆盖“边界附近”</h4><p>不是在理想天气飞 100 次，而是在包线边缘、典型误用、退化状态下重复验证。</p></article>
+      </div>
+    </section>
+
+    <!-- 08 SECURITY / EMC -->
+    <section class="section section-security" id="security">
+      <div class="section-head" data-reveal>
+        <p class="kicker">08 / CYBERSECURITY &amp; EMC</p>
+        <h2>信息安全与电磁兼容：被“黑”和被“扰”，都可能变成失控。</h2>
+        <p class="dek">X3-F 不是一个封闭机械系统：飞控软件、BMS、数据链、GNSS、OTA、营地充电与维护工具，都是攻击面。安全论证不能只写“有加密”。</p>
+      </div>
+      <div class="attack-layout">
+        <div class="attack-card" data-reveal>
+          <div class="card-head"><span>ATTACK SURFACE</span><span class="mono">7 ENTRY POINTS</span></div>
+          <div class="attack-grid">
+            <div><span>01</span><b>飞控 / 软件</b><p>未授权指令、恶意固件、参数篡改</p></div>
+            <div><span>02</span><b>GNSS / 数据链</b><p>欺骗、压制、重放、链路劫持</p></div>
+            <div><span>03</span><b>BMS / 充电</b><p>过充指令、隔离失效、充电桩攻击</p></div>
+            <div><span>04</span><b>对接 / 陆行体</b><p>解锁指令、锁止状态伪造</p></div>
+            <div><span>05</span><b>OTA / 维护</b><p>供应链投毒、维护笔记本感染</p></div>
+            <div><span>06</span><b>营地 / 云</b><p>账号接管、计划篡改、数据泄露</p></div>
+            <div><span>07</span><b>EMC / 环境</b><p>逆变器干扰、雷电、外部射频</p></div>
+          </div>
+        </div>
+        <div class="emc-card" data-reveal>
+          <div class="card-head"><span>EMC / 电磁环境</span><span class="mono">DO-160</span></div>
+          <h3>800V SiC + 高功率电机，是干扰源，也是敏感设备。</h3>
+          <p>电机控制器的高 di/dt、开关频率、线束耦合，可能干扰 GNSS、数据链、传感器；雷击、外部射频、ESD 又可能让飞控瞬态复位。EMC 不是“过个测试”，而是控制律与硬件架构的输入。</p>
+          <ul class="emc-list"><li>屏蔽、滤波、接地、分区布线</li><li>关键信号双绞/差分/隔离</li><li>雷击/瞬态/ESD 防护与复位策略</li><li>最坏干扰下的控制律验证</li></ul>
+        </div>
+      </div>
+      <div class="table-scroll" data-reveal>
+        <table class="data-table tara-table">
+          <caption>TARA / 威胁—资产—影响—缓解（教学性）</caption>
+          <thead><tr><th>资产</th><th>威胁</th><th>攻击路径</th><th>安全影响</th><th>缓解</th></tr></thead>
+          <tbody>
+            <tr><td>飞控软件</td><td>恶意固件 / 参数篡改</td><td>维护接口、OTA、供应链</td><td>非指令动作、失控</td><td>secure boot、签名、回滚、双人审批</td></tr>
+            <tr><td>GNSS / 数据链</td><td>欺骗 / 压制 / 重放</td><td>外部射频、地面站</td><td>定位错误、返航错误</td><td>多源融合、认证、跳频、惯导兜底</td></tr>
+            <tr><td>BMS</td><td>过充 / 隔离绕过</td><td>充电桩、诊断口</td><td>热失控、起火</td><td>硬件保护、隔离、充电认证</td></tr>
+            <tr><td>对接锁</td><td>伪造锁止状态</td><td>总线、传感器、维护工具</td><td>非指令释放/掉落</td><td>三取二、机械互锁、端到端认证</td></tr>
+            <tr><td>营地/云</td><td>账号接管 / 计划篡改</td><td>弱口令、API、供应链</td><td>错误放行、隐私泄露</td><td>MFA、最小权限、审计、分区</td></tr>
+            <tr><td>维护工具</td><td>恶意诊断脚本</td><td>USB、笔记本、第三方软件</td><td>带病放行</td><td>白名单、隔离、签名、配置基线</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout callout-warning" data-reveal><div><span class="callout-tag">SECURITY = SAFETY</span><h3>网络安全事件，不一定是“数据泄露”，也可能是“控制权丢失”。</h3></div><p>对载人飞行器，完整性与可用性直接对应安全。安全 case 必须把 TARA 的威胁场景接入 FTA/STPA，而不是单独写一份“网络安全报告”。</p></div>
+    </section>
+
+    <!-- 09 CRASH / FIRE -->
+    <section class="section section-crash" id="crash">
+      <div class="section-head" data-reveal>
+        <p class="kicker">09 / CRASHWORTHINESS &amp; FIRE</p>
+        <h2>最后一道防线：坠撞、起火与应急撤离。</h2>
+        <p class="dek">课程把飞行汽车安全研究点归纳为：主被动碰撞安全、电气/功能安全、SOTIF、信息安全/EMC、安全与风险评估。坠撞与防火，是“事故已经发生”之后仍然要守住的那一段。<a class="ref" href="#ref-5">[5, p.78]</a></p>
+      </div>
+      <div class="crash-grid">
+        <article data-reveal><span>01</span><h3>垂直坠撞</h3><p>eVTOL 没有传统直升机的自转下滑能力。整机伞、座椅约束、起落架/机体吸能、触地姿态，决定生存性。</p><b>关键证据：坠撞试验 + 伞降包线</b></article>
+        <article data-reveal><span>02</span><h3>纵向/横向碰撞</h3><p>地面运输、陆行体碰撞、起降场车辆入侵，都可能把飞行体当成“被撞物”；电池包与高压系统要防止二次起火。</p><b>关键证据：整车/整机碰撞 + 电池包挤压</b></article>
+        <article data-reveal><span>03</span><h3>起火与逃生</h3><p>电池热失控、线束短路、充电故障；需要探测、隔离、泄压、灭火与快速撤离。2 座舱的逃生通道必须可验证。</p><b>关键证据：整机热失控 + 撤离演示</b></article>
+      </div>
+      <div class="fire-chain" data-reveal>
+        <div class="fire-head"><span>BATTERY THERMAL RUNAWAY / 事故链</span><span class="mono">PREVENT → DETECT → CONTAIN → ESCAPE</span></div>
+        <div class="fire-steps">
+          <div><span>01</span><b>触发</b><p>内短路、挤压、过充、外部火烧</p></div>
+          <div><span>02</span><b>升温</b><p>SEI 分解、隔膜收缩、产气</p></div>
+          <div><span>03</span><b>蔓延</b><p>单体→模组→整包，热失控传播</p></div>
+          <div><span>04</span><b>后果</b><p>起火、有毒烟气、结构失效、失控</p></div>
+          <div><span>05</span><b>屏障</b><p>BMS 保护、熔断、隔热、泄压、灭火、撤离</p></div>
+        </div>
+      </div>
+      <div class="emergency-layout">
+        <div class="parachute-card" data-reveal>
+          <div class="card-head"><span>PARACHUTE / 整机多伞</span><span class="mono">LAST RESORT</span></div>
+          <h3>50 m 开伞、5.2 m/s 接地，是一个“包线内的点”，不是全包线承诺。</h3>
+          <p>公开试验展示了 850 kg、50 m 超低空开伞的能力。但安全论证还要回答：开伞高度、姿态、速度、下沉率、伞绳缠绕、重复打包、寿命与维护。</p>
+          <div class="parachute-metrics"><div><b>850 kg</b><span>试验起飞重量</span></div><div><b>50 m</b><span>超低空开伞</span></div><div><b>5.2 m/s</b><span>接地速度</span></div></div>
+        </div>
+        <div class="egress-card" data-reveal>
+          <div class="card-head"><span>EMERGENCY EGRESS</span><span class="mono">2 SEATS</span></div>
+          <h3>“能逃出来”必须被演示，而不是假设。</h3>
+          <ul><li>舱门/舱盖在正常、变形、断电状态下能否打开？</li><li>倒扣、起火、烟雾、水中（如允许）如何撤离？</li><li>乘客是否系好约束？是否被 brief？是否会误操作？</li><li>救援人员如何接近高压电池与旋翼？</li></ul>
+        </div>
+      </div>
+      <div class="callout callout-danger" data-reveal><div><span class="callout-tag">SURVIVABILITY</span><h3>安全 ≠ 不发生事故；安全 = 事故发生时，后果被限制。</h3></div><p>对 2 座飞行器，被动安全不是“附加项”。结构、约束、能量吸收、电池包容、逃生与消防救援，必须和飞控冗余一起进入安全 case。</p></div>
+    </section>
+
+    <!-- 10 GROUND -->
+    <section class="section section-ground" id="ground">
+      <div class="section-head" data-reveal>
+        <p class="kicker">10 / GROUND &amp; INTERFACE SAFETY</p>
+        <h2>地面与接口：最容易被“飞行器视角”漏掉的安全域。</h2>
+        <p class="dek">6×6 母舰的运输、自动对接、补能、收纳，构成了一组独立的危险源；其中任何一个接口错误，都可能让飞行体在不安全状态下起飞。</p>
+      </div>
+      <div class="two-case-grid">
+        <article class="case-card" data-reveal><div class="card-head"><span>CASE A / AIR</span><span class="mono">TC / PC / AC</span></div><h3>飞行体安全 case</h3><p>适航审定、设计保证、飞行包线、失效分析、伞降、电池、软件/硬件、持续适航。</p><span class="status status-orange">公开证据：部分</span></article>
+        <article class="case-card" data-reveal><div class="card-head"><span>CASE B / GROUND</span><span class="mono">VEHICLE / DOCK</span></div><h3>陆行体 + 接口安全 case</h3><p>车辆公告、碰撞、电池、高压、运输固定、对接锁止、补能、重心、顺序控制、人员隔离。</p><span class="status status-red">公开证据：更少</span></article>
+        <article class="case-card case-interface" data-reveal><div class="card-head"><span>INTERFACE / SEAM</span><span class="mono">THE THIRD DOMAIN</span></div><h3>接口不是“附件”，是独立安全域</h3><p>机械、电气、数据、热、重心、人员操作在接口处交汇；两个各自安全的系统，组合起来不一定安全。</p><span class="status status-blue">本页重点</span></article>
+      </div>
+      <div class="table-scroll" data-reveal>
+        <table class="data-table interface-table">
+          <caption>接口 FMEA / 对接、运输、补能</caption>
+          <thead><tr><th>接口</th><th>失效模式</th><th>后果</th><th>检测</th><th>缓解</th></tr></thead>
+          <tbody>
+            <tr><td>机械锁止</td><td>未锁死 / 假锁 / 意外释放</td><td>飞行体位移、掉落、结构损伤</td><td>三取二锁止传感器、视觉标记</td><td>机械互锁、顺序控制、起飞前禁止</td></tr>
+            <tr><td>电气连接</td><td>接触不良、电弧、反接</td><td>补能失败、起火、控制异常</td><td>绝缘/温度/电流监测</td><td>防呆、熔断、隔离、连接确认</td></tr>
+            <tr><td>数据连接</td><td>丢包、错误帧、版本不匹配</td><td>状态误报、错误放行</td><td>CRC、握手、版本校验</td><td>冗余总线、超时降级、签名</td></tr>
+            <tr><td>重心/固定</td><td>装载位置错误、固定带松动</td><td>运输失稳、对接偏差</td><td>称重/位置传感器、检查单</td><td>物理限位、双签、运输前检查</td></tr>
+            <tr><td>补能</td><td>过充、过温、冷却失效</td><td>热失控、火灾</td><td>BMS + 充电桩双监测</td><td>硬件保护、温度联锁、消防隔离</td></tr>
+            <tr><td>运输</td><td>急刹、侧翻、碰撞、涉水</td><td>电池/结构损伤、接口变形</td><td>碰撞传感器、外观/尺寸检查</td><td>固定、限速、路线、运输后检查</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="ground-ops" data-reveal>
+        <div class="ground-ops-head"><span>GROUND OPS / 运行现场</span><span class="mono">HUMAN + SITE + WEATHER</span></div>
+        <div class="ground-ops-grid">
+          <div><b>人员隔离</b><p>旋翼下洗、噪声、突然移动；观众、地勤、乘客动线必须分离。</p></div>
+          <div><b>FOD / 外来物</b><p>砂石、绳索、无人机；起降点清洁与巡查。</p></div>
+          <div><b>消防</b><p>电池火灾需要专用灭火剂、隔离距离与救援通道。</p></div>
+          <div><b>天气窗口</b><p>风速、阵风、能见度、雷暴；现场观测与停飞权。</p></div>
+          <div><b>空域</b><p>临时空域、NOTAM、有人机冲突、通信。</p></div>
+          <div><b>应急</b><p>迫降点、救援路线、联系人、事故报告。</p></div>
+        </div>
+      </div>
+      <div class="callout callout-danger" data-reveal><div><span class="callout-tag">INTERFACE FAILURE</span><h3>“锁止灯亮了”不等于“锁止了”。</h3></div><p>接口安全最危险的状态，是系统显示正常、物理却没锁住。必须用独立传感器、机械互锁、顺序控制与起飞前物理确认，避免单点传感器“假阳性”。</p></div>
+    </section>
+
+    <!-- 11 ARCHITECTURE -->
+    <section class="section section-architecture" id="architecture">
+      <div class="section-head" data-reveal>
+        <p class="kicker">11 / SAFETY ARCHITECTURE</p>
+        <h2>安全架构：把“危险”关进多层屏障，而不是赌一层不出错。</h2>
+        <p class="dek">防御层不是把同一件事重复三遍：每一层要独立、可检测、可降级、可验证。下面用 bow-tie 和“失效情景推演”展示：从威胁到后果，中间到底有哪些屏障。</p>
+      </div>
+      <div class="bowtie" data-reveal>
+        <div class="bowtie-col bowtie-threats"><span class="bowtie-label">THREATS / 威胁</span><div>低空阵风 / 风切变</div><div>单旋翼 / 电机失效</div><div>飞控 / 传感器共因</div><div>电池热失控</div><div>人因 / 超范围运行</div><div>网络 / EMC 攻击</div></div>
+        <div class="bowtie-col bowtie-prevent"><span class="bowtie-label">PREVENTION / 预防</span><div>ODD + 风速限制</div><div>6 旋翼 + 失效重构</div><div>3 FCC + 独立传感器</div><div>BMS + 热隔离</div><div>训练 + 包线保护</div><div>secure boot + EMC</div></div>
+        <div class="bowtie-event"><span>TOP EVENT</span><b>非指令失控 /<br>非计划迫降</b><em>Loss of control</em></div>
+        <div class="bowtie-col bowtie-mitigate"><span class="bowtie-label">MITIGATION / 缓解</span><div>整机多伞</div><div>约束 / 吸能结构</div><div>电池隔离 / 泄压</div><div>应急撤离</div><div>救援 / 消防</div></div>
+        <div class="bowtie-col bowtie-consequences"><span class="bowtie-label">CONSEQUENCES / 后果</span><div>硬着陆 / 伤害</div><div>起火 / 烟气</div><div>第三方伤害</div><div>机体损失</div></div>
+      </div>
+
+      <div class="subsection-head" data-reveal><p class="kicker">WHAT-IF / 失效情景推演</p><h3>点击一个情景，看屏障链在哪一层接住它。</h3></div>
+      <div class="scenario-sim" data-reveal>
+        <div class="sim-buttons" role="group" aria-label="选择失效情景">
+          <button class="sim-btn is-active" data-sim="rotor" type="button">单旋翼失效</button>
+          <button class="sim-btn" data-sim="gnss" type="button">GNSS 丢失</button>
+          <button class="sim-btn" data-sim="battery" type="button">电池热失控</button>
+          <button class="sim-btn" data-sim="pilot" type="button">飞行员失能</button>
+          <button class="sim-btn" data-sim="dock" type="button">对接锁未锁定</button>
+        </div>
+        <div class="sim-output" id="simOutput" aria-live="polite">
+          <div class="sim-head"><span id="simTitle">单旋翼失效</span><span id="simVerdict" class="status status-green">可控</span></div>
+          <div class="sim-chain" id="simChain"></div>
+          <p class="sim-note" id="simNote"></p>
+        </div>
+      </div>
+
+      <div class="subsection-head" data-reveal><p class="kicker">GSN / 安全论证结构</p><h3>安全 case 不是 PPT，而是“主张—证据—假设—反驳”的树。</h3></div>
+      <div class="gsn" data-reveal>
+        <div class="gsn-top"><span>TOP CLAIM / G1</span><b>在定义 ODD 内，X3-F 的运行风险可接受。</b><em>Assurance case / 教学性重构 · GSN <a class="ref" href="#ref-20">[20]</a></em></div>
+        <div class="gsn-grid">
+          <div class="gsn-node"><span>C1</span><b>运行域被正确界定与守住</b><p>ODD、场地、天气、人员、空域</p><em>Evidence: ODD 表 + 现场程序</em></div>
+          <div class="gsn-node"><span>C2</span><b>危险已被识别并控制</b><p>FHA、STPA、FMEA、FTA、风险矩阵</p><em>Evidence: 危险日志 + 分析记录</em></div>
+          <div class="gsn-node"><span>C3</span><b>屏障独立且可验证</b><p>3 FCC、6 旋翼、多伞、BMS、接口互锁</p><em>Evidence: 独立性分析 + 故障注入</em></div>
+          <div class="gsn-node"><span>C4</span><b>V&amp;V 覆盖包线与边界</b><p>台架、HIL、铁鸟、试飞、坠撞、EMC</p><em>Evidence: 试验报告 + 覆盖矩阵</em></div>
+          <div class="gsn-node"><span>C5</span><b>运行与维护持续有效</b><p>SMS、训练、维修、事件报告、持续适航</p><em>Evidence: 运行数据 + 审核记录</em></div>
+        </div>
+        <div class="gsn-bottom">
+          <div><span>ASSUMPTIONS</span><p>飞行员受训且健康；维护按大纲执行；不商业载客；不超 ODD；TARA 覆盖的威胁不发生。</p></div>
+          <div><span>DEFEATERS</span><p>无公开故障率；无独立试飞数据；无 fleet hours；共因/软件独立性未公开；运行组织能力未知。</p></div>
+        </div>
+      </div>
+      <div class="callout callout-quote" data-reveal><p>“安全 case 的价值，不是证明‘不会出事’，而是明确：在什么假设下、用什么证据、把风险控制到什么水平。”</p><span>GSN / 本页结论</span></div>
+
+      <div class="subsection-head" data-reveal><p class="kicker">SAFETY REQUIREMENTS / 需求下传</p><h3>从整机安全目标，到可测试的部件要求。</h3></div>
+      <div class="table-scroll" data-reveal>
+        <table class="data-table">
+          <caption>安全需求链 / 教学性示例</caption>
+          <thead><tr><th>整机安全目标</th><th>系统安全需求</th><th>部件/接口要求</th><th>验证证据</th></tr></thead>
+          <tbody>
+            <tr><td>SG-01 防止非指令失控</td><td>SR-01 单点失效不得导致失控；必须可降级/迫降</td><td>3 FCC 投票、6 旋翼重构、包线保护</td><td>故障注入、HIL、全包线试飞</td></tr>
+            <tr><td>SG-02 防止非指令起飞/释放</td><td>SR-02 对接锁必须三取二确认；未锁止禁止起飞</td><td>机械互锁、独立锁止传感器、顺序控制</td><td>接口试验、误操作试验、FMEA</td></tr>
+            <tr><td>SG-03 控制坠撞/起火后果</td><td>SR-03 提供伞降、约束、吸能、电池隔离与撤离</td><td>整机多伞、座椅/约束、泄压/灭火、舱门</td><td>伞降、坠撞、热失控、撤离演示</td></tr>
+            <tr><td>SG-04 防止越界运行</td><td>SR-04 ODD 必须可感知、可限制、可审计</td><td>地理围栏、能量预测、运行记录、停飞权</td><td>场景注入、运行审计、事件报告</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="table-note">需求链为教学性重构；真实项目需把每一条需求继续分解到软硬件、供应商与试验大纲，并建立双向追溯。</p>
+    </section>
+
+    <!-- 12 VERIFY -->
+    <section class="section section-verify" id="verify">
+      <div class="section-head" data-reveal>
+        <p class="kicker">12 / VERIFICATION &amp; OPERATIONS</p>
+        <h2>验证：不是“飞过”，而是“在边界附近、在退化状态下、在可重复条件下飞过”。</h2>
+        <p class="dek">课程把安全测试验证分成逻辑场景、具体场景、测试场景生成、组件/系统/整机测试、安全确认与运行安全论证。对 X3-F，最关键的证据不是一次成功演示，而是覆盖包线、故障与误用的证据矩阵。<a class="ref" href="#ref-5">[5, p.86–87]</a></p>
+      </div>
+      <div class="table-scroll" data-reveal>
+        <table class="data-table vv-table">
+          <caption>V&amp;V 矩阵 / 教学性建议</caption>
+          <thead><tr><th>层级</th><th>验证对象</th><th>方法</th><th>关键证据</th><th>现状</th></tr></thead>
+          <tbody>
+            <tr><td>分析</td><td>FHA / STPA / FMEA / FTA / TARA</td><td>桌面分析、专家评审、交叉检查</td><td>危险日志、UCA、cut set、威胁场景</td><td><span class="status status-orange">部分公开</span></td></tr>
+            <tr><td>部件</td><td>旋翼、电机、电调、BMS、伞、锁</td><td>台架、环境、寿命、故障注入</td><td>失效模式、寿命、热失控、开伞</td><td><span class="status status-orange">部分公开</span></td></tr>
+            <tr><td>系统</td><td>3 FCC、传感器、总线、电源</td><td>HIL、铁鸟、故障注入、共因分析</td><td>切换瞬态、降级包线、独立性</td><td><span class="status status-red">公开不足</span></td></tr>
+            <tr><td>整机</td><td>飞行包线、单点/多点失效、伞降</td><td>试飞、坠撞、伞降、风洞</td><td>全包线、失效组合、触地速度</td><td><span class="status status-orange">有限</span></td></tr>
+            <tr><td>环境</td><td>温度、振动、湿热、雷电、EMC</td><td>DO-160 类试验、外场</td><td>最坏环境下的功能与安全</td><td><span class="status status-red">公开不足</span></td></tr>
+            <tr><td>网络</td><td>飞控、BMS、数据链、OTA、维护</td><td>TARA、渗透、模糊测试、供应链审计</td><td>威胁覆盖、检测、响应</td><td><span class="status status-red">公开不足</span></td></tr>
+            <tr><td>运行</td><td>场地、天气、人员、维修、应急</td><td>SMS、演练、事件报告、FOQA</td><td>运行数据、事件率、闭环</td><td><span class="status status-red">待积累</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="evidence-required">
+        <article data-reveal><span>01</span><h3>独立性证据</h3><p>3 FCC 是否同源？传感器是否独立？电源/总线是否共因？需要架构图、共因分析、故障注入结果。</p></article>
+        <article data-reveal><span>02</span><h3>包线证据</h3><p>不是“能飞”，而是高度、速度、风、载荷、温度、失效组合下的包线；需要可重复试飞与边界试验。</p></article>
+        <article data-reveal><span>03</span><h3>生存性证据</h3><p>坠撞、伞降、电池热失控、起火、撤离；需要整机级试验，不是部件测试的简单外推。</p></article>
+        <article data-reveal><span>04</span><h3>运行证据</h3><p>营地、维修、训练、事件报告、持续适航；需要 fleet hours 与安全绩效指标，而不是发布会。</p></article>
+      </div>
+      <div class="metrics-grid" data-reveal>
+        <div class="metric-card"><span>PROPOSED / 01</span><b>危险闭环率</b><p>已关闭 / 总危险，按风险等级加权。</p><em>目标：高风险 100% 关闭</em></div>
+        <div class="metric-card"><span>PROPOSED / 02</span><b>失效注入覆盖率</b><p>已测试的失效组合 / 识别出的关键组合。</p><em>目标：覆盖所有最小割集</em></div>
+        <div class="metric-card"><span>PROPOSED / 03</span><b>每 1,000 架次事件率</b><p>事故、严重事件、未遂事件分层统计。</p><em>目标：趋势下降 + 无漏报</em></div>
+        <div class="metric-card"><span>PROPOSED / 04</span><b>dispatch reliability</b><p>按计划完成飞行的比例，含天气/维护取消。</p><em>目标：稳定且可解释</em></div>
+        <div class="metric-card"><span>PROPOSED / 05</span><b>维修差错率</b><p>放行后发现的维修相关缺陷 / 放行架次。</p><em>目标：双签 + 复盘</em></div>
+      </div>
+      <p class="table-note">以上为“建议建立的指标”，不是 X3-F 已公开的运行数据；目前没有公开 fleet hours、事件率或 dispatch reliability。</p>
+      <div class="callout callout-warning" data-reveal>
+        <div><span class="callout-tag">SMS / SAFETY CULTURE</span><h3>安全文化不是软性口号，而是“有人敢停飞、有人愿报告”。</h3></div>
+        <p>SMS 至少要有：事件/未遂报告、just culture、纠正措施闭环、变更管理、供应商管理、运行审计与停飞权。没有这些，技术冗余会被组织压力一点点吃掉。</p>
+      </div>
+      <div class="subsection-head" data-reveal><p class="kicker">SAFETY GATES / 六道门</p><h3>任何一道门没有证据，就不能把“能飞”升级为“可运营”。</h3></div>
+      <div class="gate-grid" data-reveal>
+        <div><span>G1</span><b>设计边界</b><p>ODD、包线、限制、假设被批准并可传达。</p><em class="status status-orange">部分</em></div>
+        <div><span>G2</span><b>危险控制</b><p>高风险危险有独立、可验证的屏障。</p><em class="status status-orange">部分</em></div>
+        <div><span>G3</span><b>适航/生产</b><p>TC/PC/AC 与生产一致性。</p><em class="status status-red">未完成</em></div>
+        <div><span>G4</span><b>安全验证</b><p>包线、失效、环境、网络、坠撞证据。</p><em class="status status-red">不足</em></div>
+        <div><span>G5</span><b>运行准备</b><p>场地、训练、维修、应急、保险；含阿联酋 sandbox 的试验运行证据 <a class="ref" href="#ref-10">[10]</a>。</p><em class="status status-orange">布局中</em></div>
+        <div><span>G6</span><b>持续监控</b><p>SMS、事件报告、FOQA、纠正措施。</p><em class="status status-red">待建立</em></div>
+      </div>
+      <div class="callout callout-warning" data-reveal><div><span class="callout-tag">WHAT WOULD CHANGE THIS ANALYSIS</span><h3>三类新证据，会显著改变结论。</h3></div><p>① 公开的独立故障率/共因分析；② 全包线失效与坠撞/热失控试验；③ 真实 fleet hours 与事件报告。只要其中一类出现，本页的风险评分与安全 case 就需要重做。</p></div>
+    </section>
+
+    <!-- 13 CONCLUSION -->
+    <section class="section section-conclusion" id="conclusion">
+      <div class="section-head" data-reveal>
+        <p class="kicker">13 / CONCLUSION</p>
+        <h2>结论：X3-F 的安全，不取决于它能飞，而取决于它是否只在被证明允许的边界内飞。</h2>
+        <p class="dek">这不是一句保守的话，而是一个工程判断：对一个新类别、2 座、短程、单驾驶的飞行器，运行边界、组织能力与人因，和旋翼冗余同样重要。</p>
+      </div>
+      <div class="conclusion-grid safety-conclusions">
+        <article data-reveal><span>01</span><h3>设计冗余是可信的起点，不是终点。</h3><p>3 FCC、6 旋翼、多伞、BMS 多级保护，构成了合理的防御架构；但独立性、共因、包线与维护证据仍缺失。</p></article>
+        <article data-reveal><span>02</span><h3>ODD 是最强的安全措施。</h3><p>昼间目视、120 m、20 km、2 座、私人/培训，消掉了大量高风险场景；越界运行必须重新做安全 case。</p></article>
+        <article data-reveal><span>03</span><h3>人因与组织，是被低估的风险。</h3><p>单驾驶、自动模式、低空短窗口、营地商业压力，都会把“技术安全”变成“运行不安全”。</p></article>
+        <article data-reveal><span>04</span><h3>地面/接口是第三安全域。</h3><p>锁止、重心、补能、运输、充电，任何一项失效都可能在起飞前埋下事故链。</p></article>
+        <article data-reveal><span>05</span><h3>TC 是门票，不是安全证明。</h3><p>真正的安全来自持续适航、事件报告、维修质量与运行监督；没有 fleet data，就不能宣称“已经安全”。</p></article>
+      </div>
+      <div class="final-quote" data-reveal><p>“安全不是一张证书，而是一条每天都要重新走一遍的论证链。”</p><span>如果只记住一句话</span></div>
+      <div class="assignment-check" data-reveal>
+        <div class="card-head"><span>ASSIGNMENT CHECK / 作业对齐</span><span class="mono">COURSE 02</span></div>
+        <div class="check-grid">
+          <div><span class="check">✓</span><p><b>对象延续</b>沿用第一次作业的汇天 X3-F，聚焦飞行体 + 陆行体 + 接口</p></div>
+          <div><span class="check">✓</span><p><b>系统安全工程</b>ODD、FHA、STPA、FMEA、FTA、SOTIF、TARA、GSN</p></div>
+          <div><span class="check">✓</span><p><b>全方位</b>空中、地面、接口、人因、组织、网络、EMC、坠撞、火灾</p></div>
+          <div><span class="check">✓</span><p><b>Web 形式</b>根目录 index.html；Public 仓库；可直接部署</p></div>
+          <div><span class="check">✓</span><p><b>证据边界</b>公开资料 + 教学评分；不伪造故障率/适航结论</p></div>
+          <div><span class="check">✓</span><p><b>可审计</b>危险日志、cut set、UCA、GSN、V&amp;V 矩阵均可追溯</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 14 EVIDENCE -->
+    <section class="section section-evidence" id="evidence">
+      <div class="section-head" data-reveal>
+        <p class="kicker">14 / EVIDENCE &amp; REFERENCES</p>
+        <h2>证据链：哪些是官方事实，哪些是本页的分析。</h2>
+        <p class="dek">安全分析最忌讳“把推断写成事实”。下面把最关键的命题拆成“来源—能支持—不能支持”，并列出全部参考。</p>
+      </div>
+      <div class="table-scroll" data-reveal>
+        <table class="evidence-table">
+          <caption>证据矩阵 / 安全命题</caption>
+          <thead><tr><th>#</th><th>命题</th><th>来源</th><th>能支持</th><th>不能支持</th></tr></thead>
+          <tbody>
+            <tr><td>01</td><td>X3-F 为 2 座、880 kg、20 km/20 min、72 km/h、120 m AGL、昼间目视</td><td>CAAC 专用条件 <a class="ref" href="#ref-4">[4]</a></td><td>设计边界与运行限制</td><td>实际可靠性、噪声、维护成本</td></tr>
+            <tr><td>02</td><td>3 套飞控、6 旋翼中 1–2 个失效仍可迫降、整机多伞</td><td>中国证券报 / 公开报道 <a class="ref" href="#ref-6">[6]</a><a class="ref" href="#ref-7">[7]</a></td><td>设计意图与部分试验</td><td>共因、全包线、故障率</td></tr>
+            <tr><td>03</td><td>整机多伞 850 kg、50 m、5.2 m/s 接地</td><td>公开试验报道 <a class="ref" href="#ref-7">[7]</a></td><td>特定点的开伞能力</td><td>全包线、重复可靠性、伞绳缠绕</td></tr>
+            <tr><td>04</td><td>电池 360 Wh/kg、25C、15.2 m 坠落测试</td><td>中创新航 / 媒体 <a class="ref" href="#ref-8">[8]</a></td><td>电芯/包级性能与安全测试</td><td>整机热失控传播、碰撞后绝缘</td></tr>
+            <tr><td>05</td><td>TC 进入最后阶段、TIA 已签发、69 项通过</td><td>企业披露 / 媒体 <a class="ref" href="#ref-9">[9]</a></td><td>符合性验证进展</td><td>TC 已颁发、运行安全</td></tr>
+            <tr><td>06</td><td>本页 16 个危险源、5×5 评分、FMEA RPN</td><td>本页教学性分析</td><td>风险排序与讨论框架</td><td>真实概率、企业设计数据</td></tr>
+            <tr><td>07</td><td>STPA 控制结构、UCA、损失场景</td><td>本页重构 + STPA 方法 <a class="ref" href="#ref-19">[19]</a></td><td>识别控制不安全因素</td><td>真实控制拓扑、软件逻辑</td></tr>
+            <tr><td>08</td><td>FTA cut set 与 GSN 安全 case</td><td>本页教学性重构</td><td>展示论证结构</td><td>官方 FTA、适航安全 case</td></tr>
+            <tr><td>09</td><td>运行边界是主要安全措施</td><td>CAAC 专用条件 + 课程框架 <a class="ref" href="#ref-4">[4]</a><a class="ref" href="#ref-5">[5]</a></td><td>限定运行域可降低风险</td><td>边界内一定安全</td></tr>
+            <tr><td>10</td><td>目前无公开 fleet hours / 事件率 / MTBF</td><td>公开资料检索</td><td>证据缺口的判断</td><td>不能证明“没有风险”</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="limitations" data-reveal>
+        <div class="card-head"><span>LIMITATIONS / 局限</span><span class="mono">READ BEFORE CITING</span></div>
+        <ul>
+          <li><b>没有企业设计数据。</b>控制拓扑、FMEA、FTA、软件架构、失效率均未公开；本页的图是教学性重构。</li>
+          <li><b>没有独立试验。</b>无法验证伞降包线、共因、热失控传播、EMC、网络攻击等关键证据。</li>
+          <li><b>评分是专家判断。</b>5×5 矩阵与 RPN 用于排序和讨论，不是概率风险分析（PRA）。</li>
+          <li><b>不是适航结论。</b>本页不声称 X3-F 符合 ARP4754A、DO-178C、ISO 26262 或任何标准。</li>
+          <li><b>状态会变化。</b>TC/交付/运行限制可能更新；提交前应复核 CAAC 与企业公告。</li>
+        </ul>
+      </div>
+      <div class="ai-note" data-reveal><div class="card-head"><span>AI USE / 工具记录</span><span class="mono">TRANSPARENCY</span></div><p>本页使用 AI 辅助完成资料检索、安全分析结构化、SVG 图解、前端编码与文案整理。关键事实回溯至参考文献；评分、FTA、STPA、GSN 均为教学性分析，已明确标注，不冒充企业或局方结论。提交前请作者通读并复核。</p></div>
+
+      <div class="subsection-head" data-reveal><p class="kicker">REFERENCES / 参考文献</p><h3>官方文件、标准、课程与方法。</h3></div>
+      <ol class="ref-list" data-reveal>
+        <li id="ref-1"><span class="ref-num">[1]</span><div><b>ARIDGE.</b> Land Aircraft Carrier — Modular Flying Car[EB/OL]. <a href="https://www.aridge.com/x3" target="_blank" rel="noopener">https://www.aridge.com/x3</a>. 访问日期：2026-11-26.</div></li>
+        <li id="ref-2"><span class="ref-num">[2]</span><div><b>小鹏汽车.</b> 小鹏汇天“陆地航母”飞行体型号合格证（TC）申请获局方受理[EB/OL]. 2024-03-25. <a href="https://www.xiaopeng.com/news/company_news/5271.html" target="_blank" rel="noopener">https://www.xiaopeng.com/news/company_news/5271.html</a>.</div></li>
+        <li id="ref-3"><span class="ref-num">[3]</span><div><b>上海证券报.</b> 小鹏汇天“陆地航母”飞行体专用条件征求意见：主要用于私人娱乐飞行[EB/OL]. 2025-03-19. <a href="https://www.cnstock.com/commonDetail/377540" target="_blank" rel="noopener">https://www.cnstock.com/commonDetail/377540</a>.</div></li>
+        <li id="ref-4"><span class="ref-num">[4]</span><div><b>中国民用航空局.</b> X3-F 型航空器专用条件（征求意见稿）[EB/OL]. 2025-03. <a href="https://app.caac.gov.cn/HDJL/YJZJ/202503/P020250318503054424381.docx" target="_blank" rel="noopener">https://app.caac.gov.cn/HDJL/YJZJ/202503/P020250318503054424381.docx</a>.</div></li>
+        <li id="ref-5"><span class="ref-num">[5]</span><div><b>张玉新.</b> 飞行汽车技术基础：第五章 飞行汽车产业分析及支撑技术[课件]. 吉林大学, 2026. 引用页码：78–88.</div></li>
+        <li id="ref-6"><span class="ref-num">[6]</span><div><b>中国证券报.</b> 小鹏汇天：“陆地航母”迈向适航审定[EB/OL]. 2024-04-03. <a href="https://finance.sina.com.cn/jjxw/2024-04-03/doc-inaqnzye3241761.shtml" target="_blank" rel="noopener">https://finance.sina.com.cn/jjxw/2024-04-03/doc-inaqnzye3241761.shtml</a>.</div></li>
+        <li id="ref-7"><span class="ref-num">[7]</span><div><b>PConline.</b> 小鹏汇天自研整机多伞救生系统飞行开伞试验成功[EB/OL]. 2023-10. <a href="https://news.pconline.com.cn/broadcasting/2310/16731416.html" target="_blank" rel="noopener">https://news.pconline.com.cn/broadcasting/2310/16731416.html</a>.</div></li>
+        <li id="ref-8"><span class="ref-num">[8]</span><div><b>快科技.</b> 中创新航打造：最大放电功率 25C，小鹏飞行汽车电池量产下线[EB/OL]. 2026-03-27. <a href="https://m.mydrivers.com/newsview/1111943.html" target="_blank" rel="noopener">https://m.mydrivers.com/newsview/1111943.html</a>.</div></li>
+        <li id="ref-9"><span class="ref-num">[9]</span><div><b>PConline.</b> 汇天飞行汽车：全球首张有人驾驶 eVTOL TC 认证进入最后阶段[EB/OL]. 2026-11-25. <a href="https://news.pconline.com.cn/2186/21862396.html" target="_blank" rel="noopener">https://news.pconline.com.cn/2186/21862396.html</a>.</div></li>
+        <li id="ref-10"><span class="ref-num">[10]</span><div><b>新华社.</b> 投入阿联酋低空示范区的首架飞行汽车在广州下线[EB/OL]. 2026-10-22. <a href="https://www.news.cn/auto/20261022/d9d43baca94847ceac2eeff9b83de03d/c.html" target="_blank" rel="noopener">https://www.news.cn/auto/20261022/d9d43baca94847ceac2eeff9b83de03d/c.html</a>.</div></li>
+        <li id="ref-11"><span class="ref-num">[11]</span><div><b>SAE International.</b> ARP4754A — Guidelines for Development of Civil Aircraft and Systems[S]. 2010.</div></li>
+        <li id="ref-12"><span class="ref-num">[12]</span><div><b>SAE International.</b> ARP4761A — Guidelines and Methods for Conducting the Safety Assessment Process on Civil Airborne Systems and Equipment[S]. 2023.</div></li>
+        <li id="ref-13"><span class="ref-num">[13]</span><div><b>RTCA.</b> DO-178C — Software Considerations in Airborne Systems and Equipment Certification[S]. 2011.</div></li>
+        <li id="ref-14"><span class="ref-num">[14]</span><div><b>RTCA.</b> DO-254 — Design Assurance Guidance for Airborne Electronic Hardware[S]. 2000.</div></li>
+        <li id="ref-15"><span class="ref-num">[15]</span><div><b>RTCA.</b> DO-160 — Environmental Conditions and Test Procedures for Airborne Equipment[S].</div></li>
+        <li id="ref-16"><span class="ref-num">[16]</span><div><b>ISO.</b> ISO 26262:2018 — Road vehicles — Functional safety[S]. 2018.</div></li>
+        <li id="ref-17"><span class="ref-num">[17]</span><div><b>ISO.</b> ISO 21448:2022 — Road vehicles — Safety of the intended functionality[S]. 2022.</div></li>
+        <li id="ref-18"><span class="ref-num">[18]</span><div><b>ISO/SAE.</b> ISO/SAE 21434:2021 — Road vehicles — Cybersecurity engineering[S]. 2021.</div></li>
+        <li id="ref-19"><span class="ref-num">[19]</span><div><b>LEVESON N, THOMAS J.</b> STPA Handbook[EB/OL]. 2018. <a href="https://psas.scripts.mit.edu/home/get_file.php?name=STPA_handbook.pdf" target="_blank" rel="noopener">https://psas.scripts.mit.edu/home/get_file.php?name=STPA_handbook.pdf</a>.</div></li>
+        <li id="ref-20"><span class="ref-num">[20]</span><div><b>Assurance Case Working Group.</b> Goal Structuring Notation (GSN) Community Standard[EB/OL]. <a href="https://scsc.uk/gsn" target="_blank" rel="noopener">https://scsc.uk/gsn</a>. 访问日期：2026-11-26.</div></li>
+        <li id="ref-21"><span class="ref-num">[21]</span><div><b>张玉新.</b> The Flying Tesla Roadster：技术、场景与市场可行性[EB/OL]. 吉林大学自动驾驶安全联合实验室, 2026-11-17. <a href="https://lab.autozyx.com/fundamentals-of-flying-vehicle-technology/tesla-flying-roadster/" target="_blank" rel="noopener">https://lab.autozyx.com/fundamentals-of-flying-vehicle-technology/tesla-flying-roadster/</a>.</div></li>
+      </ol>
+      <div class="ref-foot" data-reveal><p><b>引用规范：</b>课程作业可按 GB/T 7714—2015 重新排版；标准条目保留编号与年份。</p><p><b>图片声明：</b>页内所有系统图、风险矩阵、故障树、bow-tie、GSN 均为原创 SVG/HTML 图解，不对应官方安全评估。</p><p><b>数据声明：</b>证据截止 2026-11-26；TC/交付/运行限制可能变化，提交前请复核。</p></div>
+    </section>
+  </main>
+
+  <footer class="site-footer safety-footer">
+    <div class="footer-grid">
+      <div>
+        <p class="footer-kicker">飞行汽车技术基础 · 第二次作业</p>
+        <p class="footer-title">让每一次起飞，都有证据。</p>
+        <p class="footer-desc">汇天「陆地航母」X3-F 全方位安全分析。教学性安全论证，不构成官方安全评估、适航结论或投资建议。</p>
+      </div>
+      <div class="footer-meta">
+        <p><span>作者</span> XLALA18 / 15230104</p>
+        <p><span>课程</span> 飞行汽车技术基础（选修）· 2026</p>
+        <p><span>网页</span> <a href="https://XLALA18.github.io/Flying-car-coursework2/" target="_blank" rel="noopener">XLALA18.github.io/Flying-car-coursework2/</a></p>
+        <p><span>仓库</span> <a href="https://github.com/XLALA18/Flying-car-coursework2" target="_blank" rel="noopener">github.com/XLALA18/Flying-car-coursework2</a></p>
+        <p><span>声明</span> 所有图解为原创 SVG；引用见参考文献。</p>
+      </div>
+    </div>
+    <div class="footer-bottom"><span>© 2026 / SAFETY CASE 02</span><span>STPA · FMEA · FTA · SOTIF · TARA · GSN</span><a href="#top">回到顶部 ↑</a></div>
+  </footer>
+  <script src="app.js"></script>
+</body>
+</html>
